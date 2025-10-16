@@ -1,0 +1,5 @@
+C: plus bas niveau -> meilleur controle sur la complexité, mieux d'un pdv algorithmique
+OCaml: plus haut niveau que C mais plus à l'aise, performance reste bonne car compilation native
+(pour compilation native, utiliser ocamlopt, plutot que ocamlc)
+
+Question 1: faire par l'absurde
