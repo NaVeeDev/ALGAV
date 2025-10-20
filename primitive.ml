@@ -76,7 +76,9 @@ let insert t c =
       let l = Node (Empty, (Some '#', 0), Empty) in
       let r = Node (Empty, (Some c, 1), Empty) in
       Node (l, (None, 1), r)
-    | Node (t1, (k, i), t2) -> if k = Some c then raise (Invalid_argument "L'arbre contient déjà cette clé.") 
+    | Node (t1, (k, i), t2) -> if k = Some c then Node(t1, (Some c, i + 1), t2)
                                else Node(loop t1, (k,i), loop t2)
   in
-  loop t                    
+  loop t 
+  
+let 

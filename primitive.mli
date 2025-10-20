@@ -63,21 +63,13 @@ val is_gdbh : btree -> bool
 val is_adding_up : btree -> bool
 
 (** [insert t c] insert dans l'arbre [t] le noeud dont la clé est [c] et la valeur 1.
+    Si [c] est déjà présente dans l'arbre, la valeur du noeud correspondant est incrémentée de 1.
 
     @param t l'arbre gdbh dans lequel on veut insérer un nouveau noeud.
     @param c la clé du nouveau noeud.
-    @return l'arbre gdbh avec son nouveau noeud.
+    @return l'arbre gdbh mis à jour.
 *)
 val insert : btree -> char -> btree
-
-(** [increment t c] incrémente la valeur du noeud de clé [c] dans l'arbre [t].
-
-    @param t l'arbre gdbh dans lequel on veut incrémenter la valeur d'un noeud.
-    @param c la clé du noeud dont on veut incrémenter la valeur.
-    @return l'arbre gdbh avec la valeur du noeud incrémentée.
-    @raise Not_found si le noeud de clé [c] n'existe pas dans l'arbre [t].
-*)
-val increment : btree -> char -> btree
 
 (** [switch t c1 c2] échange les places des noeuds de clés [c1] et [c2] dans
     l'arbre [t].
