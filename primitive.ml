@@ -1,10 +1,14 @@
+(*##### FONCTIONS POUR LES LISTES ####*)
+
 let rec is_sorted l =
   match l with
   | [] | [_] -> true
   | x :: x' :: ll -> x < x' && is_sorted (x'::ll)
 
-type btree = Empty | Node of btree * (char * int) * btree
+type btree = Empty | Node of btree * (char option * int) * btree
 
+
+(*##### FONCTIONS POUR LES ARBRES BINAIRES ####*)
 let rec is_lte t v =
   match t with 
   | Empty -> true
@@ -13,7 +17,7 @@ let rec is_lte t v =
 let rec is_gte t v = 
   match t with 
   | Empty -> true 
-  | Node (t1, (_,i), t2) -> i >= v && (is_gte t1 v) && (is_lte t2 v)
+  | Node (t1, (_,i), t2) -> i >= v && (is_gte t1 v) && (is_gte t2 v)
 
 let max_t t =
   let rec loop t acc =
@@ -24,7 +28,6 @@ let max_t t =
   in
   loop t 0
 
-(*TODO : TESTS*)
 let vals_per_depth t = 
   let rec loop acc curr =
     match curr with 
@@ -49,3 +52,31 @@ let is_gdbh t =
                  is_gd && is_bh && loop (Some (List.hd (List.rev x))) ll
   in
   loop None lvl
+
+let is_adding_up t =
+  let rec loop t =
+    match t with
+    | Node (t1, (_,i), t2) -> 
+        let sum_children = match t1, t2 with
+          | Node (_,(_,v1), _), Node (_,(_,v2), _) -> v1 + v2
+          | Node (_,(_,v1), _), Empty -> v1
+          | Empty, Node (_,(_,v2), _) -> v2
+          | Empty, Empty -> 0
+        in
+        i = sum_children && loop t1 && loop t2
+    | Empty -> true
+      in
+  loop t
+
+let insert t c = 
+  let rec loop t =
+    match t with
+    | Empty -> Empty
+    | Node (Empty, (Some '#', 0), Empty) ->
+      let l = Node (Empty, (Some '#', 0), Empty) in
+      let r = Node (Empty, (Some c, 1), Empty) in
+      Node (l, (None, 1), r)
+    | Node (t1, (k, i), t2) -> if k = Some c then raise (Invalid_argument "L'arbre contient déjà cette clé.") 
+                               else Node(loop t1, (k,i), loop t2)
+  in
+  loop t                    
