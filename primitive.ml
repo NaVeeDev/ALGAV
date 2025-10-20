@@ -49,4 +49,3 @@ let is_gdbh t =
                  is_gd && is_bh && loop (Some (List.hd (List.rev x))) ll
   in
   loop None lvl
-
