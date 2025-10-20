@@ -1,2 +1,2 @@
-(** [test_all_] lance tous les tests du projet. *)
-val test_all_ : unit -> unit
+(** [test_] lance TOUS les tests du projet *)
+val test_ : unit -> unit
