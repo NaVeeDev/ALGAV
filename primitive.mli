@@ -46,7 +46,7 @@ val max_t : btree -> int
     @param t l'arbre auquel on s'intéresse.
     @return la liste de de toutes les valeurs de [t] niveau par niveau, de gauche
     à droite. Ainsi res.nth i correspond aux valeurs de [t] à la i-ème profondeur.*)
-val vals_per_depth : btree -> int -> (int list) list
+val vals_per_depth : btree -> (int list) list
 
 (** [is_gdbh t] indique si l'arbre donné [t] est bien un arbre qui suit la hierarchie gdbh.
 
@@ -71,17 +71,6 @@ val is_adding_up : btree -> bool
 *)
 val insert : btree -> char -> btree
 
-(** [switch t c1 c2] échange les places des noeuds de clés [c1] et [c2] dans
-    l'arbre [t].
-    
-    @param t l'arbre dans lequel on veut échanger les noeuds.
-    @param c1 la clé d'un des noeuds qu'on souhaite échanger.
-    @param c2 la clé d'un autre des noeuds qu'on souhaite échanger.
-    @return l'arbre avec les noeuds échangés. L'arbre obtenun'est pas forcément
-    un arbre gdbh. 
-*)
-val switch : btree -> char -> char -> btree
-
 (** [print_btree t] affiche l'arbre [t] de manière lisible.
 
     @param t l'arbre à afficher.
@@ -95,3 +84,10 @@ val print_btree : btree -> unit
     @return true si la clé est présente, false sinon.
 *)
 val mem : btree -> char -> bool
+
+(** [update_weights t] met à jour les poids des noeuds afin que [adding_up] renvoie true.
+
+    @param t l'arbre qu'on veut mettre à jour.
+    @return l'arbre mis à jour.
+*)
+val update_weights : btree -> btree 

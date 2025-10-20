@@ -76,8 +76,32 @@ let is_adding_up t =
 let insert t c = 
   let rec loop t =
     match t with
-    | Leaf (EmptyChar, 0) -> Node (t, 1, Leaf(c, 1))
-    | Leaf (k,v) -> if k = c then Leaf(k, v+1) else t
+    | Leaf (EmptyChar, 0) -> Node (t, 1, Leaf((Char c), 1))
+    | Leaf (k,v) -> (match k with
+       | Char (c) -> Leaf(k, v+1) 
+       |_ -> t)
     | Node (t1, i, t2) -> Node (loop t1, i, loop t2)
   in
   loop t 
+
+let print_btree t = failwith "Not yet implemented"
+
+let rec mem t c =
+  match t with 
+  | Leaf (ch, _) -> (match ch with Char c' -> c' = c | _ -> false)
+  | Node (t1,_, t2) -> mem t1 c || mem t2 c
+
+let update_weights t =
+  let rec loop t =
+    match t with 
+    | Leaf (_,_) -> t
+    | Node (t1, _, t2) -> let new_t1, new_t2 = loop t1, loop t2 in
+                          let sum = match new_t1, new_t2 with
+                          | Node (_,v1, _), Node (_,v2, _)
+                          | Leaf (_, v1), Node (_, v2,_) 
+                          | Node (_, v1, _), Leaf (_, v2)
+                          | Leaf (_, v1), Leaf (_, v2) -> v1 + v2
+                          in
+                          Node(new_t1, sum, new_t2)
+      in
+    loop t

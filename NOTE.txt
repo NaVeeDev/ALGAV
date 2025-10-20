@@ -7,3 +7,7 @@ Question 1: faire par l'absurde
 Question 3 :
     Lecture des bits inspirée par
     https://caml.inria.fr/pub/old_caml_site/caml-list/0817.html
+
+réfléchir à la primitive switch qui permet d'echanger deux elements (noeud ou feuille) de l'arbre entre eux:
+-> passer deux elements en arg sachant que pour les feuilles on peut facilement les identifier dans 
+    l'arbre comme la clé est unique mais pour les noeuds ??
