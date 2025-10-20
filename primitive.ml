@@ -5,38 +5,43 @@ let rec is_sorted l =
   | [] | [_] -> true
   | x :: x' :: ll -> x < x' && is_sorted (x'::ll)
 
-type btree = Empty | Node of btree * (char option * int) * btree
 
+(*##### STRUCTURE POUR LES ARBRES BINAIRES ####*)
+
+type chara = EmptyChar | Char of char
+type btree = Leaf of chara * int | Node of btree * int * btree
 
 (*##### FONCTIONS POUR LES ARBRES BINAIRES ####*)
 let rec is_lte t v =
   match t with 
-  | Empty -> true
-  | Node(t1, (_,i), t2) -> i <= v && (is_lte t1 v) && (is_lte t2 v)
+  | Leaf (_, i) -> i <= v
+  | Node(t1, i, t2) -> i <= v && (is_lte t1 v) && (is_lte t2 v)
 
 let rec is_gte t v = 
   match t with 
-  | Empty -> true 
-  | Node (t1, (_,i), t2) -> i >= v && (is_gte t1 v) && (is_gte t2 v)
+  | Leaf (_,i) -> i >= v 
+  | Node (t1, i, t2) -> i >= v && (is_gte t1 v) && (is_gte t2 v)
 
 let max_t t =
   let rec loop t acc =
     match t with 
-    | Empty -> acc
-    | Node (t1, (_,i), t2) -> if acc < i then loop t2 (loop t1 i) 
+    | Leaf (_,i) -> if i > acc then i else acc
+    | Node (t1, i, t2) -> if acc < i then loop t2 (loop t1 i) 
     else loop t2 (loop t1 acc)
   in
   loop t 0
 
 let vals_per_depth t = 
   let rec loop acc curr =
-    match curr with 
+    match curr with
     | [] -> List.rev acc
-    | _ -> let vals, next = List.fold_left (fun (v,n) -> function
-                            | Empty -> (v,n)
-                            | Node (t1, (_,i), t2) -> (i::v, n @ [t1; t2])) 
-                            ([],[]) curr in
-            loop (List.rev vals :: acc) next
+    | _ ->
+        let vals, next = List.fold_left (fun (v,n) node ->
+            match node with
+            | Leaf (_, i) -> (i :: v, n)
+            | Node (l, i, r) -> (i :: v, n @ [l; r])
+          ) ([], []) curr in
+        loop (List.rev vals :: acc) next
   in
   loop [] [t]
 
@@ -56,29 +61,23 @@ let is_gdbh t =
 let is_adding_up t =
   let rec loop t =
     match t with
-    | Node (t1, (_,i), t2) -> 
+    | Node (t1, i, t2) -> 
         let sum_children = match t1, t2 with
-          | Node (_,(_,v1), _), Node (_,(_,v2), _) -> v1 + v2
-          | Node (_,(_,v1), _), Empty -> v1
-          | Empty, Node (_,(_,v2), _) -> v2
-          | Empty, Empty -> 0
+          | Node (_,v1, _), Node (_,v2, _)
+          | Leaf (_, v1), Node (_, v2,_) 
+          | Node (_, v1, _), Leaf (_, v2)
+          | Leaf (_, v1), Leaf (_, v2) -> v1 + v2
         in
-        i = sum_children && loop t1 && loop t2
-    | Empty -> true
+        loop t1 && loop t2 && i = sum_children
+    | Leaf (_,_) -> true
       in
   loop t
 
 let insert t c = 
   let rec loop t =
     match t with
-    | Empty -> Empty
-    | Node (Empty, (Some '#', 0), Empty) ->
-      let l = Node (Empty, (Some '#', 0), Empty) in
-      let r = Node (Empty, (Some c, 1), Empty) in
-      Node (l, (None, 1), r)
-    | Node (t1, (k, i), t2) -> if k = Some c then Node(t1, (Some c, i + 1), t2)
-                               else Node(loop t1, (k,i), loop t2)
+    | Leaf (EmptyChar, 0) -> Node (t, 1, Leaf(c, 1))
+    | Leaf (k,v) -> if k = c then Leaf(k, v+1) else t
+    | Node (t1, i, t2) -> Node (loop t1, i, loop t2)
   in
   loop t 
-  
-let 

@@ -13,12 +13,12 @@ val is_sorted : int list -> bool
 
 (** [btree] est la structure pour représenter un arbre binaire.
     Seules les feuilles contiennent un char.
-    Les noeuds internes sont représentés par un None.
 *)
-type btree = Empty | Node of btree * (char option* int) * btree
+type chara = EmptyChar | Char of char
+type btree = Leaf of chara * int | Node of btree * int * btree
 
 (** [is_lte t v] vérifie si toutes les valeurs de [t] sont inférieures ou égales
-    à v.
+    à [v].
     
     @param t l'arbre auquel on s'intéresse.
     @param v la valeur pour laquelle on veut vérifier la propriété.
