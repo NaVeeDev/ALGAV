@@ -1,9 +1,9 @@
 (*##### FONCTIONS POUR LES LISTES ####*)
 
-let rec is_sorted l =
+let rec is_sorted (l : int list) : bool =
   match l with
   | [] | [_] -> true
-  | x :: x' :: ll -> x < x' && is_sorted (x'::ll)
+  | x :: x' :: ll -> x <= x' && is_sorted (x'::ll)
 
 
 (*##### STRUCTURE POUR LES ARBRES BINAIRES ####*)
@@ -12,17 +12,17 @@ type chara = EmptyChar | Char of char
 type btree = Leaf of chara * int | Node of btree * int * btree
 
 (*##### FONCTIONS POUR LES ARBRES BINAIRES ####*)
-let rec is_lte t v =
+let rec is_lte (t : btree) (v : int) : bool =
   match t with 
   | Leaf (_, i) -> i <= v
   | Node(t1, i, t2) -> i <= v && (is_lte t1 v) && (is_lte t2 v)
 
-let rec is_gte t v = 
+let rec is_gte (t : btree) (v : int) : bool = 
   match t with 
   | Leaf (_,i) -> i >= v 
   | Node (t1, i, t2) -> i >= v && (is_gte t1 v) && (is_gte t2 v)
 
-let max_t t =
+let max_t (t : btree) : int =
   let rec loop t acc =
     match t with 
     | Leaf (_,i) -> if i > acc then i else acc
@@ -31,7 +31,7 @@ let max_t t =
   in
   loop t 0
 
-let vals_per_depth t = 
+let vals_per_depth (t : btree) : int list list = 
   let rec loop acc curr =
     match curr with
     | [] -> List.rev acc
@@ -45,7 +45,7 @@ let vals_per_depth t =
   in
   loop [] [t]
 
-let is_gdbh t = 
+let is_gdbh (t : btree) : bool = 
   let lvl = List.filter (fun l -> l <> []) (vals_per_depth t) in
   let rec loop last_of_prev_list l = 
     match l with 
@@ -58,7 +58,7 @@ let is_gdbh t =
   in
   loop None lvl
 
-let is_adding_up t =
+let is_adding_up (t : btree) : bool =
   let rec loop t =
     match t with
     | Node (t1, i, t2) -> 
@@ -73,7 +73,7 @@ let is_adding_up t =
       in
   loop t
 
-let insert t c = 
+let insert (t : btree) (c : char) : btree = 
   let rec loop t =
     match t with
     | Leaf (EmptyChar, 0) -> Node (t, 1, Leaf((Char c), 1))
@@ -84,14 +84,14 @@ let insert t c =
   in
   loop t 
 
-let print_btree t = failwith "Not yet implemented"
+let print_btree (t : btree) : unit = failwith "Not yet implemented"
 
-let rec mem t c =
+let rec mem (t : btree) (c : char) : bool =
   match t with 
   | Leaf (ch, _) -> (match ch with Char c' -> c' = c | _ -> false)
   | Node (t1,_, t2) -> mem t1 c || mem t2 c
 
-let update_weights t =
+let update_weights (t : btree) : btree =
   let rec loop t =
     match t with 
     | Leaf (_,_) -> t
