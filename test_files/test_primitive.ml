@@ -15,164 +15,83 @@ let test_is_sorted_ () =
   assert (not (Primitive.is_sorted [49; 1; 2; 3; 4]));
 ;;
 (*##### FONCTIONS POUR LES ARBRES BINAIRES ####*)
+open Primitive
 
-let test_is_lte_ () = 
-  let open Primitive in
-  
-  let emptyLeaf = Leaf (EmptyChar, 0) in 
+let create_leaf chara i = { content = Leaf (chara, i) }
+let create_node b1 i b2 = { content = Node (b1, i, b2) }
+
+
+let test_is_lte_ () =
+  let emptyLeaf = create_leaf EmptyChar 0 in 
   assert (is_lte emptyLeaf 0);
   assert (is_lte emptyLeaf 100);
   assert (not (is_lte emptyLeaf (-100)));
 
-  let negativeLeaf = Leaf (EmptyChar, -1000) in 
+  let negativeLeaf = create_leaf EmptyChar (-1000) in 
   assert (is_lte negativeLeaf 10);
   assert (is_lte negativeLeaf (-1000));
   assert (not (is_lte negativeLeaf (-4125)));
 
-  let positiveLeaf = Leaf (EmptyChar, 1692) in 
+  let positiveLeaf = create_leaf EmptyChar 1692 in 
   assert (is_lte positiveLeaf 1692);
   assert (not (is_lte positiveLeaf (-1340)));
   assert (is_lte positiveLeaf 11564);
 
-  let tree1 = Node (emptyLeaf, 0, emptyLeaf) in 
+  let tree1 = create_node emptyLeaf 0 emptyLeaf in 
   assert (is_lte tree1 0);
   assert (is_lte tree1 100);
   assert (not (is_lte tree1 (-100)));
-
-  let tree1_expended = 
-    Node (
-      Node (
-        emptyLeaf,0, Node(emptyLeaf,0,emptyLeaf)
-      ),
-      0,
-      Node (
-        Node(
-          Node(
-            Node(
-              Node(emptyLeaf,0, emptyLeaf),0, emptyLeaf
-            ),
-            0,
-            Node(emptyLeaf,0, emptyLeaf)
-          ),
-          0,
-          emptyLeaf
-        ),
-        0,
-        Node(
-          emptyLeaf,0, emptyLeaf
-        )
-     )
-    )
-  in 
-  assert (is_lte tree1_expended 0);
-  assert (is_lte tree1_expended 100);
-  assert (not (is_lte tree1_expended (-100)));
-
-  let tree2 =
-    Node(
-      Node(
-        Leaf(EmptyChar, 100),
-        4,
-        Leaf(EmptyChar, 130)
-      ),
-      67,
-      Node(
-        Node(
-          Leaf(EmptyChar, 180),
-          148,
-          Node(
-            Leaf(EmptyChar, 170),
-            138,
-            Node(
-              Node(
-                Leaf(EmptyChar, 128),
-                68,
-                Leaf(EmptyChar, 201)
-              ),
-              200,
-              emptyLeaf
+  
+  let tree1_expanded =
+    create_node
+      (create_node emptyLeaf 0 (create_node emptyLeaf 0 emptyLeaf))
+      0
+      (create_node
+         (create_node
+            (create_node
+               (create_node emptyLeaf 0 emptyLeaf)
+               0
+               emptyLeaf
             )
-          )
-        ),
-        49,
-        Leaf(EmptyChar, 120)
+            0
+            (create_node emptyLeaf 0 emptyLeaf)
+         )
+         0
+         (create_node emptyLeaf 0 emptyLeaf)
       )
-    )
   in
-  assert (is_lte tree2 201);
-  assert (is_lte tree2 202);
-  assert (not (is_lte tree2 199));
-  assert (not (is_lte tree2 0));
-
-  let tree1_expended = 
-    Node (
-      Node (
-        emptyLeaf,0, Node(emptyLeaf,0,emptyLeaf)
-      ),
-      0,
-      Node (
-        Node(
-          Node(
-            Node(
-              Node(emptyLeaf,0, emptyLeaf),0, emptyLeaf
-            ),
-            0,
-            Node(emptyLeaf,0, emptyLeaf)
-          ),
-          0,
-          emptyLeaf
-        ),
-        0,
-        Node(
-          emptyLeaf,0, emptyLeaf
-        )
-     )
-    )
-  in 
-  assert (is_lte tree1_expended 0);
-  assert (is_lte tree1_expended 100);
-  assert (not (is_lte tree1_expended (-100)));
+  assert (is_lte tree1_expanded 0);
+  assert (is_lte tree1_expanded 100);
+  assert (not (is_lte tree1_expanded (-100)));
 
   let tree2 =
-    Node(
-      Node(
-        Leaf(EmptyChar, 100),
-        4,
-        Leaf(EmptyChar, 130)
-      ),
-      67,
-      Node(
-        Node(
-          Leaf(EmptyChar, 180),
-          148,
-          Node(
-            Leaf(EmptyChar, 170),
-            138,
-            Node(
-              emptyLeaf,
-              201,
-              Node(
-                Leaf(EmptyChar, 128),
-                68,
-                Leaf(EmptyChar, 200)
-              )
+    create_node
+      (create_node (create_leaf EmptyChar 100) 4 (create_leaf EmptyChar 130))
+      67
+      (create_node
+         (create_node (create_leaf EmptyChar 180) 148
+            (create_node (create_leaf EmptyChar 170) 138
+               (create_node
+                  (create_node (create_leaf EmptyChar 128) 68 (create_leaf EmptyChar 201))
+                  200
+                  emptyLeaf
+               )
             )
-          )
-        ),
-        49,
-        Leaf(EmptyChar, 120)
+         )
+         49
+         (create_leaf EmptyChar 120)
       )
-    )
   in
   assert (is_lte tree2 201);
   assert (is_lte tree2 202);
   assert (not (is_lte tree2 199));
   assert (not (is_lte tree2 0));
 ;;
+
 
 let test_is_gte_ () =
   failwith "todo"
-;;
+
 
 (* Appeler cette fonction pour executer les tests *)
 let test_primitive_ () =

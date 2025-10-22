@@ -35,7 +35,7 @@ all: $(MAIN_EXEC)
 # Dépendances
 $(TEST_DIR)/test_primitive.cmx: primitive.cmx
 $(TEST_DIR)/test_utils.cmx: utils.cmx
-$(TEST_DIR)/test.cmx: utils.cmx $(TEST_DIR)/test_utils.cmx
+$(TEST_DIR)/test.cmx: utils.cmx $(TEST_DIR)/test_utils.cmx $(TEST_DIR)/test_primitive.cmx
 
 # Exécutable principal
 $(MAIN_EXEC): utils.cmi utils.cmx main.cmx
