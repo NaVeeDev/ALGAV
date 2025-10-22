@@ -30,11 +30,7 @@ let lecture (bin_file : string) : unit =
 
 
 let ecriture (input_file : string) (output_file : string) : unit =
-  let rec write_byte oc l =
-    match l with 
-    | [] -> ()
-    | x :: ll -> output_byte oc x; write_byte oc ll
-  in
+  let byte_to_int l = List.fold_right(fun x a -> 2*a+x) l 0 in
   try 
     let ochannel = open_out_bin output_file in
     let ichannel = open_in input_file in
@@ -42,19 +38,18 @@ let ecriture (input_file : string) (output_file : string) : unit =
     let rec loop l =
       try 
         let char = input_char ichannel in
-        
+        let new_l = (match char with
+        | '\n' -> raise End_of_file
+        | '1' -> 1 :: l  
+        | '0' -> 0 :: l
+        | _ -> invalid_arg ("The input file is not properly formatted.")) in
         let new_l = if pos_in ichannel mod 8 = 0 then (
-          write_byte ochannel l;
+          output_byte ochannel (byte_to_int new_l);
           []
-        ) else l in
-        match char with
-        | '\n' -> ()
-        | '1' -> loop (1 :: new_l)  
-        | '0' -> loop (0 :: new_l)
-        | _ -> invalid_arg ("The input file is not properly formatted.") 
-        
+        ) else new_l in 
+        loop new_l;
         with | Invalid_argument _ -> invalid_arg ("The input file is not properly formatted.")
-        | End_of_file -> ()
+        | End_of_file -> if l <> [] then output_byte ochannel (byte_to_int l); ()
       in loop [];
       close_in ichannel;
       close_out ochannel;
