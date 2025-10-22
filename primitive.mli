@@ -15,7 +15,7 @@ val is_sorted : int list -> bool
     Seules les feuilles contiennent un char.
 *)
 type chara = EmptyChar | Char of char
-type btree = Leaf of chara * int | Node of btree * int * btree
+type btree = Leaf of chara * int | Node of btree ref * int * btree ref
 
 (** [is_lte t v] vérifie si toutes les valeurs de [t] sont inférieures ou égales
     à [v].
@@ -91,3 +91,13 @@ val mem : btree -> char -> bool
     @return l'arbre mis à jour.
 *)
 val update_weights : btree -> btree 
+
+(** [switch t t1 t2] échange l'emplacement des noeuds [t1] et [t2] dans l'arbre [t].
+
+    @param t l'arbre dans lequel on veut échanger les noeuds.
+    @param t1 le premier noeud à échanger.
+    @param t2 le deuxième noeud à échanger.
+    @return l'arbre [t] avec les noeuds [t1] et [t2] échangés.
+    @raise Invalid_argument si [t1] ou [t2] ne sont pas présents dans [t].
+*)
+val switch : btree -> btree -> btree -> btree

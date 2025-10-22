@@ -9,41 +9,43 @@ let rec is_sorted (l : int list) : bool =
 (*##### STRUCTURE POUR LES ARBRES BINAIRES ####*)
 
 type chara = EmptyChar | Char of char
-type btree = Leaf of chara * int | Node of btree * int * btree
+type btree = Leaf of chara * int | Node of btree ref * int * btree ref
 
 (*##### FONCTIONS POUR LES ARBRES BINAIRES ####*)
 let rec is_lte (t : btree) (v : int) : bool =
   match t with 
   | Leaf (_, i) -> i <= v
-  | Node(t1, i, t2) -> i <= v && (is_lte t1 v) && (is_lte t2 v)
+  | Node(t1, i, t2) -> i <= v && (is_lte !t1 v) && (is_lte !t2 v)
 
 let rec is_gte (t : btree) (v : int) : bool = 
   match t with 
   | Leaf (_,i) -> i >= v 
-  | Node (t1, i, t2) -> i >= v && (is_gte t1 v) && (is_gte t2 v)
+  | Node (t1, i, t2) -> i >= v && (is_gte !t1 v) && (is_gte !t2 v)
 
 let max_t (t : btree) : int =
   let rec loop t acc =
     match t with 
     | Leaf (_,i) -> if i > acc then i else acc
-    | Node (t1, i, t2) -> if acc < i then loop t2 (loop t1 i) 
-    else loop t2 (loop t1 acc)
+    | Node (t1, i, t2) -> if acc < i then loop !t2 (loop !t1 i) 
+    else loop !t2 (loop !t1 acc)
   in
   loop t 0
 
-let vals_per_depth (t : btree) : int list list = 
-  let rec loop acc curr =
+let vals_per_depth (t : btree) : int list list =
+  let rec loop curr acc =
     match curr with
     | [] -> List.rev acc
     | _ ->
-        let vals, next = List.fold_left (fun (v,n) node ->
-            match node with
-            | Leaf (_, i) -> (i :: v, n)
-            | Node (l, i, r) -> (i :: v, n @ [l; r])
-          ) ([], []) curr in
-        loop (List.rev vals :: acc) next
+      let vals, next =
+        List.fold_right (fun node (vals_acc, next_acc) ->
+          match node with
+          | Leaf (_, i) -> (i :: vals_acc, next_acc)
+          | Node (l, i, r) -> (i :: vals_acc, !l :: !r :: next_acc)
+        ) curr ([], [])
+      in
+      loop next (vals :: acc)
   in
-  loop [] [t]
+  loop [t] []
 
 let is_gdbh (t : btree) : bool = 
   let lvl = List.filter (fun l -> l <> []) (vals_per_depth t) in
@@ -62,13 +64,13 @@ let is_adding_up (t : btree) : bool =
   let rec loop t =
     match t with
     | Node (t1, i, t2) -> 
-        let sum_children = match t1, t2 with
+        let sum_children = match !t1, !t2 with
           | Node (_,v1, _), Node (_,v2, _)
           | Leaf (_, v1), Node (_, v2,_) 
           | Node (_, v1, _), Leaf (_, v2)
           | Leaf (_, v1), Leaf (_, v2) -> v1 + v2
         in
-        loop t1 && loop t2 && i = sum_children
+        loop !t1 && loop !t2 && i = sum_children
     | Leaf (_,_) -> true
       in
   loop t
@@ -76,11 +78,11 @@ let is_adding_up (t : btree) : bool =
 let insert (t : btree) (c : char) : btree = 
   let rec loop t =
     match t with
-    | Leaf (EmptyChar, 0) -> Node (t, 1, Leaf((Char c), 1))
+    | Leaf (EmptyChar, 0) -> Node (ref t, 1, ref (Leaf((Char c), 1)))
     | Leaf (k,v) -> (match k with
        | Char (c) -> Leaf(k, v+1) 
        |_ -> t)
-    | Node (t1, i, t2) -> Node (loop t1, i, loop t2)
+    | Node (t1, i, t2) -> Node (ref (loop !t1), i, ref (loop !t2))
   in
   loop t 
 
@@ -89,19 +91,22 @@ let print_btree (t : btree) : unit = failwith "Not yet implemented"
 let rec mem (t : btree) (c : char) : bool =
   match t with 
   | Leaf (ch, _) -> (match ch with Char c' -> c' = c | _ -> false)
-  | Node (t1,_, t2) -> mem t1 c || mem t2 c
+  | Node (t1,_, t2) -> mem !t1 c || mem !t2 c
 
 let update_weights (t : btree) : btree =
   let rec loop t =
     match t with 
     | Leaf (_,_) -> t
-    | Node (t1, _, t2) -> let new_t1, new_t2 = loop t1, loop t2 in
+    | Node (t1, _, t2) -> let new_t1, new_t2 = loop !t1, loop !t2 in
                           let sum = match new_t1, new_t2 with
                           | Node (_,v1, _), Node (_,v2, _)
                           | Leaf (_, v1), Node (_, v2,_) 
                           | Node (_, v1, _), Leaf (_, v2)
                           | Leaf (_, v1), Leaf (_, v2) -> v1 + v2
                           in
-                          Node(new_t1, sum, new_t2)
+                          Node (ref new_t1, sum, ref new_t2)
       in
     loop t
+
+
+
