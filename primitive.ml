@@ -134,4 +134,27 @@ let switch (t1 : btree) (t2 : btree) =
   t1.content <- t2.content;
   t2.content <- temp
 
-let finBloc h m = failwith "TODO"
+let finBloc (h : btree) (m : btree) : btree =
+  let p = 
+    match m.content with 
+    | Leaf (_, p) | Node (_, p, _) -> p 
+  in
+  let rec loop btree k =
+    match btree.content with 
+    | Leaf (_, i) -> if i = p then Some (btree, k) else None 
+    | Node (b1, i, b2) ->
+      if i = k then Some (btree, k) else 
+      let o1 = loop b1 (k+1) in 
+      let o2 = loop b2 (k+1) in 
+      match o1, o2 with 
+      | None, None -> None
+      | None, Some (a, b) | Some (a, b), None -> Some(a, b)
+      | Some (a1, b1), Some (a2, b2) ->
+        if b1 < b2 then Some (a1, b1) else 
+        Some (a2, b2)
+  in
+  let o = loop h 0 in 
+  match o with 
+  | None -> failwith "isn't supposed to happen"
+  | Some (res, _) -> res
+
