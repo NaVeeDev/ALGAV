@@ -12,6 +12,20 @@ type chara = EmptyChar | Char of char
 type btree_ = Leaf of chara * int | Node of btree * int * btree
 and btree = {mutable content : btree_}
 
+module CharaKey = struct
+  type t = chara
+
+  let compare (key1 : t) (key2 : t) = match key1, key2 with
+  | EmptyChar, EmptyChar -> 0 (* On pourrait aussi faire crasher comme il ne peut pas y en avoir 2*)
+  | EmptyChar, Char _ -> -1
+  | Char _, EmptyChar -> 1
+  | Char c1, Char c2 -> Char.compare c1 c2
+end
+
+module CharaMap = Map.Make(CharaKey)
+
+type btreeTable = btree CharaMap.t 
+
 (*##### FONCTIONS POUR LES ARBRES BINAIRES ####*)
 let rec is_lte (t : btree) (v : int) : bool =
   match t.content with 
@@ -90,10 +104,8 @@ let insert (t : btree) (c : char) : btree =
 
 let print_btree (t : btree) : unit = failwith "Not yet implemented"
 
-let rec mem (t : btree) (c : char) : bool =
-  match t.content with 
-  | Leaf (ch, _) -> (match ch with Char c' -> c' = c | _ -> false)
-  | Node (t1,_, t2) -> mem t1 c || mem t2 c
+let rec mem (c : chara) (m : btreeTable) : bool =
+  CharaMap.mem c m
 
 let update_weights (t : btree) : btree =
   let rec loop t =

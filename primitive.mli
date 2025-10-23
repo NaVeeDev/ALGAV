@@ -78,10 +78,10 @@ val insert : btree -> char -> btree
 *)
 val print_btree : btree -> unit
 
-(** [mem t c] vérifie si la clé [c] est présente dans l'arbre [t].
+(** [mem c m] vérifie si la clé [c] est présente dans l'arbre.
 
-    @param t l'arbre dans lequel on cherche la clé.
     @param c la clé que l'on cherche.
+    @param m le dictionnaire correspondant à l'arbre
     @return true si la clé est présente, false sinon.
 *)
 val mem : btree -> char -> bool
