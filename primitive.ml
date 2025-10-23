@@ -91,16 +91,23 @@ let is_adding_up (t : btree) : bool =
       in
   loop t
 
-let insert (t : btree) (c : char) : btree = 
-  let rec loop t =
-    match t.content with
-    | Leaf (EmptyChar, 0) -> Node (t, 1, {content = Leaf((Char c), 1)} )
-    | Leaf (k,v) -> (match k with
-       | Char (c) -> Leaf(k, v+1) 
-       | _ -> t.content)
-    | Node (t1, i, t2) -> Node ({content = loop t1}, i, {content = loop t2} )
-  in
-  {content = loop t}
+let insert (bTab : btreeTable) (c : char) : btreeTable = 
+  match (CharaMap.find_opt (Char c) bTab) with 
+  | None -> (*ajouter a la place de #*)
+    let hashtag = CharaMap.find EmptyChar bTab in 
+    let leaf1 = {content = Leaf(EmptyChar, 0)} in
+    let leaf2 = {content = Leaf(Char c, 1)} in
+    hashtag.content <- Node (leaf1, 1, leaf2);
+    let bTab = CharaMap.add EmptyChar leaf1 bTab in
+    let bTab = CharaMap.add (Char c) leaf2 bTab in
+    bTab
+  | Some btree -> (*incrémenter de 1*)
+    match btree.content with 
+    | Leaf (_, i) -> 
+      btree.content <- Leaf(Char c, (i+1));
+      bTab
+    | _ -> failwith "shouldn't happen"
+;;
 
 let print_btree (t : btree) : unit = failwith "Not yet implemented"
 

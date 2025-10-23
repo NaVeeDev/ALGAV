@@ -18,6 +18,15 @@ type chara = EmptyChar | Char of char
 type btree_ = Leaf of chara * int | Node of btree * int * btree
 and btree = {mutable content : btree_}
 
+(** [btreeTable] est la structure pour représenter la map qui associe des chara à un btree.
+*)
+module CharaKey : sig
+  type t = chara
+  val compare : t -> t -> int
+end
+module CharaMap : Map.S with type key = CharaKey.t
+type btreeTable = btree CharaMap.t
+
 (** [is_lte t v] vérifie si toutes les valeurs de [t] sont inférieures ou égales
     à [v].
     
@@ -66,11 +75,11 @@ val is_adding_up : btree -> bool
 (** [insert t c] insert dans l'arbre [t] le noeud dont la clé est [c] et la valeur 1.
     Si [c] est déjà présente dans l'arbre, la valeur du noeud correspondant est incrémentée de 1.
 
-    @param t l'arbre gdbh dans lequel on veut insérer un nouveau noeud.
+    @param bTab la map contenant les références aux btree..
     @param c la clé du nouveau noeud.
-    @return l'arbre gdbh mis à jour.
+    @return la table mise à jour.
 *)
-val insert : btree -> char -> btree
+val insert : btreeTable -> char -> btreeTable
 
 (** [print_btree t] affiche l'arbre [t] de manière lisible.
 
@@ -84,7 +93,7 @@ val print_btree : btree -> unit
     @param m le dictionnaire correspondant à l'arbre
     @return true si la clé est présente, false sinon.
 *)
-val mem : btree -> char -> bool
+val mem : chara -> btreeTable -> bool
 
 (** [update_weights t] met à jour les poids des noeuds afin que [adding_up] renvoie true.
 
