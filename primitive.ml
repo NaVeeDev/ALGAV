@@ -114,18 +114,18 @@ let print_btree (t : btree) : unit = failwith "Not yet implemented"
 let rec mem (c : chara) (m : btreeTable) : bool =
   CharaMap.mem c m
 
-let update_weights (t : btree) : btree =
+let update_weights (t : btree) : unit =
   let rec loop t =
     match t.content with 
-    | Leaf (_,_) -> t
-    | Node (t1, _, t2) -> let new_t1, new_t2 = loop t1, loop t2 in
-                          let sum = match new_t1.content, new_t2.content with
+    | Leaf (_,_) -> ()
+    | Node (t1, _, t2) -> loop t1; loop t2;
+                          let sum = match t1.content, t2.content with
                           | Node (_,v1, _), Node (_,v2, _)
                           | Leaf (_, v1), Node (_, v2,_) 
                           | Node (_, v1, _), Leaf (_, v2)
                           | Leaf (_, v1), Leaf (_, v2) -> v1 + v2
                           in
-                          {content = Node (new_t1, sum, new_t2)}
+                          t.content <- Node (t1, sum, t2);
       in
     loop t
 

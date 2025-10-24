@@ -157,17 +157,164 @@ let test_is_gte_ () =
 ;;
 
 let test_max_t_ () =
+   failwith "todo"
+;;
+
+let test_update_weights_ () =
+   let l1 = create_leaf (Char 'a') 1 in 
+   let l2 = create_leaf (Char 'b') 2 in 
+   let l3 = create_leaf (Char 'c') 3 in 
+   let l4 = create_leaf (Char 'd') 4 in 
+
+   let l5 = create_leaf (Char 'e') 5 in 
+   let l6 = create_leaf (Char 'f') 6 in 
+   let l7 = create_leaf (Char 'g') 7 in 
+   let l8 = create_leaf (Char 'h') 8 in
+   
+   let n4 = create_node l1 (-5) l2 in 
+   let n5 = create_node l3 (-5) l4 in 
+   let n6 = create_node l5 (-5) l6 in 
+   let n7 = create_node l7 (-5) l8 in
+
+   let n2 = create_node n4 (-12) n5 in
+   let n3 = create_node n6 (-12) n7 in
+
+   let n1 = create_node n2 (-12) n3 in
+
+   update_weights n1;
+
+   (match n1.content with 
+   | Leaf _ -> assert false;
+   | Node (e1, p, e2) ->
+      assert (p = 36);
+      (match e1.content with 
+      | Node (e1, p, e2) -> 
+         assert (p = 10);
+         (match e1.content with
+         | Node (e1, p, e2) -> 
+            assert (p = 3);
+            assert (e1 == l1);
+            assert (e2 == l2);
+         | _ -> assert false;
+         );
+         (match e2.content with 
+         | Node (e1, p, e2) -> 
+            assert (p = 7);
+            assert (e1 == l3);
+            assert (e2 == l4);
+         | _ -> assert false;
+         );
+      | _ -> assert false;
+      );
+      (match e2.content with 
+      | Node (e1, p, e2) -> 
+         assert (p = 26);
+         (match e1.content with
+         | Node (e1, p, e2) -> 
+            assert (p = 11);
+            assert (e1 == l5);
+            assert (e2 == l6);
+         | _ -> assert false;
+         );
+         (match e2.content with 
+         | Node (e1, p, e2) -> 
+            assert (p = 15);
+            assert (e1 == l7);
+            assert (e2 == l8);
+         | _ -> assert false;
+         );
+      | _ -> assert false;
+      );
+   );
+   ()
+;;
+
+let test_switch_ () =
+   let l1 = create_leaf (Char 'a') 1 in 
+   let l2 = create_leaf (Char 'b') 2 in 
+   let l3 = create_leaf (Char 'c') 3 in 
+   let n2 = create_node l1 3 l2 in
+   let n1 = create_node n2 6 l3 in 
+   switch n2 l3;
+   (match n1.content with 
+   | Node (e1, _, e2) ->
+      (match e1.content with 
+      | Leaf (_, i) -> assert (i = 3)
+      | _ -> assert false
+      );
+      (match e2.content with 
+      | Leaf _ -> assert false
+      | Node (_, i, _) -> assert (i = 3)
+      );
+   | _ -> assert false);
+   switch n2 l3;
+   (match n1.content with 
+   | Node (e1, _, e2) ->
+      (match e2.content with 
+      | Leaf (_, i) -> assert (i = 3)
+      | _ -> assert false
+      );
+      (match e1.content with 
+      | Leaf _ -> assert false
+      | Node (_, i, _) -> assert (i = 3)
+      );
+   | _ -> assert false);
+   switch l2 l1;
+   (match n2.content with 
+    | Leaf _ -> assert false
+    | Node (e1, _, e2) -> 
+      (match e1.content with
+      | Leaf (_, i) -> assert (i = 2)
+      | _ -> assert false
+      );
+      (match e2.content with
+      | Leaf (_, i) -> assert (i = 1)
+      | _ -> assert false
+      )
+   );
+   switch l2 l1;
+   (match n2.content with 
+    | Leaf _ -> assert false
+    | Node (e1, _, e2) -> 
+      (match e2.content with
+      | Leaf (_, i) -> assert (i = 2)
+      | _ -> assert false
+      );
+      (match e1.content with
+      | Leaf (_, i) -> assert (i = 1)
+      | _ -> assert false
+      )
+   );
+   switch l1 l3;
+   (match n1.content with 
+   | Node (e1, _, e2) ->
+      (match e2.content with 
+      | Leaf (_, i) -> assert (i = 1)
+      | _ -> assert false
+      );
+      (match e1.content with
+      | Leaf _ -> assert false;
+      | Node (_, i, _) ->
+         assert (i=3);
+         assert (e1.content = n2.content)
+      )
+   | _ -> assert false;
+   );
+   (match n2.content with 
+    | Leaf _ -> assert false
+    | Node (e, _, _) -> 
+      (match e.content with
+      | Leaf (_, i) -> assert (i = 3)
+      | _ -> assert false
+      );
+   );
    ()
 ;;
 
 let test_finBloc_ () =
   let leaf = create_leaf (Char 'x') 10 in
-  let result1 = finBloc leaf leaf in
-  (match result1.content with
-  | Leaf (Char ch, v) ->
-      assert (ch = 'x');
-      assert (v = 10)
-  | _ -> assert false);
+  let result = finBloc leaf leaf in
+  assert (result == leaf);
 
   let left = create_leaf EmptyChar 3 in
   let right = create_leaf (Char 'c') 3 in
@@ -175,12 +322,7 @@ let test_finBloc_ () =
 
   let result = finBloc root left in
 
-  (match result.content with
-  | Leaf (c, v) -> assert (v = 3);
-                   (match c with 
-                   | EmptyChar -> assert false
-                   | Char ch -> assert (ch = 'c'))
-  | _ -> assert false);
+  assert (result == right);
   
   (*
        (_ , 15)
@@ -202,9 +344,7 @@ let test_finBloc_ () =
   
   let result = finBloc root_big l1 in
 
-  (match result.content with
-  | Leaf _ -> assert false;
-  | Node(_,i,_) -> assert (i=5));
+  assert (result == right_big);
 
    (*
                    (root, 45)
@@ -236,52 +376,31 @@ let test_finBloc_ () =
   let root = create_node n1 45 n2 in
 
   let result = finBloc root l7 in
-  (match result.content with
-  | Leaf _ -> assert false
-  | Node(_,i,_) -> assert (i=0));
+  assert (result == n4);
 
   let result = finBloc root l3 in
-  (match result.content with
-  | Leaf _ -> assert false
-  | Node(_,i,_) -> assert (i=0));
+  assert (result == n4);
 
   let result = finBloc root l4 in
-  (match result.content with
-  | Leaf _ -> assert false
-  | Node(_,i,_) -> assert (i=0));
+  assert (result == n4);
 
   let result = finBloc root n4 in
-  (match result.content with
-  | Leaf _ -> assert false
-  | Node(_,i,_) -> assert (i=0));
-
-
+  assert (result == n4);
 
   let result = finBloc root l8 in
-  (match result.content with
-  | Leaf _ -> assert false
-  | node -> assert (node == n1.content));
+  assert (result == n1);
 
   let result = finBloc root n1 in
-  (match result.content with
-  | Leaf _ -> assert false
-  | node -> assert (node == n1.content));
+  assert (result == n1);
 
-   let result = finBloc root n3 in
-  (match result.content with
-  | Leaf _ -> assert false
-  | node -> assert (node == n1.content));
+  let result = finBloc root n3 in
+  assert (result == n1);
 
   let result = finBloc root n5 in
-  (match result.content with
-  | Leaf _ -> assert false
-  | node -> assert (node == n1.content));
+  assert (result == n1);
 
   let result = finBloc root n6 in
-  (match result.content with
-  | Leaf _ -> assert false
-  | node -> assert (node == n1.content));
-  ()
+  assert (result == n1);
 ;;
 
 
@@ -292,8 +411,10 @@ let test_primitive_ () =
     test_is_sorted_ ();
     test_is_lte_ ();
     test_is_gte_ ();
-    test_max_t_ ();
     test_finBloc_ ();
+    test_switch_ ();
+    test_update_weights_ ();
+    (* test_max_t_ (); *)
     
     Printf.printf "___ Tous les tests de test_primitive.ml sont passés ___\n"
   with e -> Printf.printf "_Un test de test_primitive.ml n'est pas passé : \n%s\n" (Printexc.to_string e);

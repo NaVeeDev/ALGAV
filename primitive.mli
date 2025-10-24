@@ -98,9 +98,8 @@ val mem : chara -> btreeTable -> bool
 (** [update_weights t] met à jour les poids des noeuds afin que [adding_up] renvoie true.
 
     @param t l'arbre qu'on veut mettre à jour.
-    @return l'arbre mis à jour.
 *)
-val update_weights : btree -> btree 
+val update_weights : btree -> unit 
 
 (** [switch t1 t2] échange l'emplacement des noeuds [t1] et [t2].
 
