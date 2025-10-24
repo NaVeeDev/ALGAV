@@ -143,7 +143,7 @@ let finBloc (h : btree) (m : btree) : btree =
     match btree.content with 
     | Leaf (_, i) -> if i = p then Some (btree, k) else None 
     | Node (b1, i, b2) ->
-      if i = k then Some (btree, k) else 
+      if i = p then Some (btree, k) else 
       let o1 = loop b1 (k+1) in 
       let o2 = loop b2 (k+1) in 
       match o1, o2 with 
