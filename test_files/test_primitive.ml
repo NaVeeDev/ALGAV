@@ -156,10 +156,6 @@ let test_is_gte_ () =
   assert (is_gte tree2 0);
 ;;
 
-let test_max_t_ () =
-   failwith "todo"
-;;
-
 let test_update_weights_ () =
    let l1 = create_leaf (Char 'a') 1 in 
    let l2 = create_leaf (Char 'b') 2 in 
@@ -404,6 +400,434 @@ let test_finBloc_ () =
 ;;
 
 
+let test_insert_ () =
+   let tree = {content = Leaf (EmptyChar, 0)} in 
+   let table = CharaMap.empty in 
+   let table = CharaMap.add EmptyChar tree table in
+
+   let table = insert table 'a' in 
+   assert (mem (Char 'a') table);
+   let o = CharaMap.find_opt (Char 'a') table in 
+   (match o with 
+   | None -> assert false;
+   | Some btree -> (match btree.content with 
+                   | Leaf (chara, i) -> (match chara with 
+                                   | EmptyChar -> assert false; 
+                                   | Char c -> assert (c = 'a')
+                                   );
+                                   assert (i=1)
+                   | _ -> assert false;
+   ));
+   (match tree.content with
+   | Leaf _ -> assert false
+   | Node (e1, _, e2) -> (match e1.content with
+                         | Leaf (chara, i) -> (match chara with 
+                                         | EmptyChar -> assert true; 
+                                         | _ -> assert false;
+                                         );
+                                         assert (i=0)
+                         | _ -> assert false;
+                         );
+                         (match e2.content with
+                         | Leaf (chara, i) -> (match chara with 
+                                         | EmptyChar -> assert false; 
+                                         | Char c -> assert (c = 'a')
+                                         );
+                                         assert (i=1)
+                         | _ -> assert false;
+                         );
+   );
+   
+   let table = insert table 'a' in 
+   assert (mem (Char 'a') table);
+   let o = CharaMap.find_opt (Char 'a') table in 
+   (match o with 
+   | None -> assert false;
+   | Some btree -> (match btree.content with 
+                   | Leaf (chara, i) -> (match chara with 
+                                   | EmptyChar -> assert false; 
+                                   | Char c -> assert (c = 'a')
+                                   );
+                                   assert (i=2)
+                   | _ -> assert false;
+   ));
+   (match tree.content with
+   | Leaf _ -> assert false
+   | Node (e1, _, e2) -> (match e1.content with
+                         | Leaf (chara, i) -> (match chara with 
+                                         | EmptyChar -> assert true; 
+                                         | _ -> assert false;
+                                         );
+                                         assert (i=0)
+                         | _ -> assert false;
+                         );
+                         (match e2.content with
+                         | Leaf (chara, i) -> (match chara with 
+                                         | EmptyChar -> assert false; 
+                                         | Char c -> assert (c = 'a')
+                                         );
+                                         assert (i=2)
+                         | _ -> assert false;
+                         );
+   );
+
+   let table = insert table 'b' in 
+   assert (mem (Char 'a') table);
+   assert (mem (Char 'b') table);
+   let o = CharaMap.find_opt (Char 'a') table in 
+   (match o with 
+   | None -> assert false;
+   | Some btree -> (match btree.content with 
+                   | Leaf (chara, i) -> (match chara with 
+                                   | EmptyChar -> assert false; 
+                                   | Char c -> assert (c = 'a')
+                                   );
+                                   assert (i=2)
+                   | _ -> assert false;
+   ));
+   let o = CharaMap.find_opt (Char 'b') table in 
+   (match o with 
+   | None -> assert false;
+   | Some btree -> (match btree.content with 
+                   | Leaf (chara, i) -> (match chara with 
+                                   | EmptyChar -> assert false; 
+                                   | Char c -> assert (c = 'b')
+                                   );
+                                   assert (i=1)
+                   | _ -> assert false;
+   ));
+   (match tree.content with
+   | Leaf _ -> assert false
+   | Node (e1, _, e2) -> (match e2.content with
+                         | Leaf (chara, i) -> (match chara with 
+                                         | EmptyChar -> assert false; 
+                                         | Char c -> assert (c = 'a');
+                                         );
+                                         assert (i=2)
+                         | _ -> assert false;
+                         );
+                         (match e1.content with
+                         | Leaf _ -> assert false;
+                         | Node (e1, _, e2) -> 
+                           (match e1.content with
+                           | Leaf (chara, i) -> (match chara with 
+                                                | EmptyChar -> assert true;
+                                                | _ -> assert false;
+                                                );
+                                                assert (i=0);
+                           | _ -> assert false;
+                           );
+                           (match e2.content with
+                           | Leaf (chara, i) -> (match chara with 
+                                          | EmptyChar -> assert false; 
+                                          | Char c -> assert (c = 'b')
+                                          );
+                                          assert (i=1)
+                           | _ -> assert false;
+                           );
+                         );
+   );
+
+   let table = insert table 'b' in 
+   assert (mem (Char 'a') table);
+   assert (mem (Char 'b') table);
+   let o = CharaMap.find_opt (Char 'a') table in 
+   (match o with 
+   | None -> assert false;
+   | Some btree -> (match btree.content with 
+                   | Leaf (chara, i) -> (match chara with 
+                                   | EmptyChar -> assert false; 
+                                   | Char c -> assert (c = 'a')
+                                   );
+                                   assert (i=2)
+                   | _ -> assert false;
+   ));
+   let o = CharaMap.find_opt (Char 'b') table in 
+   (match o with 
+   | None -> assert false;
+   | Some btree -> (match btree.content with 
+                   | Leaf (chara, i) -> (match chara with 
+                                   | EmptyChar -> assert false; 
+                                   | Char c -> assert (c = 'b')
+                                   );
+                                   assert (i=2)
+                   | _ -> assert false;
+   ));
+   (match tree.content with
+   | Leaf _ -> assert false
+   | Node (e1, _, e2) -> (match e2.content with
+                         | Leaf (chara, i) -> (match chara with 
+                                         | EmptyChar -> assert false; 
+                                         | Char c -> assert (c = 'a');
+                                         );
+                                         assert (i=2)
+                         | _ -> assert false;
+                         );
+                         (match e1.content with
+                         | Leaf _ -> assert false;
+                         | Node (e1, _, e2) -> 
+                           (match e1.content with
+                           | Leaf (chara, i) -> (match chara with 
+                                                | EmptyChar -> assert true;
+                                                | _ -> assert false;
+                                                );
+                                                assert (i=0);
+                           | _ -> assert false;
+                           );
+                           (match e2.content with
+                           | Leaf (chara, i) -> (match chara with 
+                                          | EmptyChar -> assert false; 
+                                          | Char c -> assert (c = 'b')
+                                          );
+                                          assert (i=2);
+                           | _ -> assert false;
+                           );
+                         );
+   );
+   ()
+;;
+
+
+let test_is_adding_up_ () = 
+   let tree = {content = Leaf (EmptyChar, 0)} in 
+   let table = CharaMap.empty in 
+   let table = CharaMap.add EmptyChar tree table in
+
+   for i = 0 to 2 do
+      let _ = insert table 'a' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'a' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'b' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'b' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+      
+      let _ = insert table 'a' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'c' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'd' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'd' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'a' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'e' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'f' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'e' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'g' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'h' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'o' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'd' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'c' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+
+      let _ = insert table 'd' in 
+      update_weights tree;
+      assert (is_adding_up tree);
+   done;
+   ()
+;;
+
+let test_is_gdbh_ () =
+   (*
+                   (root, 256)
+                 /            \
+          (n1, 128)           (n2, 128)
+          /      \           /      \
+     (n3, 64)  (n4, 64)  (n5, 64) (n6, 64)
+      /   \     /   \     /   \    /   \
+    (32) (32) (32)  (32) (32) (32)(32) (32)
+   *)
+
+  let l1 = create_leaf (Char 'a') 32 in
+  let l2 = create_leaf (Char 'b') 32 in
+  let l3 = create_leaf (Char 'c') 32 in
+  let l4 = create_leaf (Char 'd') 32 in
+  let l5 = create_leaf (Char 'e') 32 in
+  let l6 = create_leaf (Char 'f') 32 in
+  let l7 = create_leaf (Char 'g') 32 in
+  let l8 = create_leaf (Char 'h') 32 in
+
+  let n3 = create_node l1 64 l2 in
+  let n4 = create_node l3 64 l4 in
+  let n5 = create_node l5 64 l6 in
+  let n6 = create_node l7 64 l8 in
+
+  let n1 = create_node n3 128 n4 in
+  let n2 = create_node n5 128 n6 in
+
+  let root = create_node n1 256 n2 in
+
+  assert (is_gdbh root);
+
+
+   (*
+                   (root, 45)
+                 /            \
+          (n1, 15)           (n2, 30)
+          /      \           /      \
+     (n3, 15)  (n4, 0)  (n5, 15)  (n6, 15)
+      /   \     /   \     /   \    /   \
+    (7)   (8) (0)  (0)  (6)  (9) (0)  (15)
+   *)
+
+  let l1 = create_leaf (Char 'a') 7 in
+  let l2 = create_leaf (Char 'b') 8 in
+  let l3 = create_leaf (Char 'c') 0 in
+  let l4 = create_leaf (Char 'd') 0 in
+  let l5 = create_leaf (Char 'e') 6 in
+  let l6 = create_leaf (Char 'f') 9 in
+  let l7 = create_leaf (Char 'g') 0 in
+  let l8 = create_leaf (Char 'h') 15 in
+
+  let n3 = create_node l1 15 l2 in
+  let n4 = create_node l3 0 l4 in
+  let n5 = create_node l5 15 l6 in
+  let n6 = create_node l7 15 l8 in
+
+  let n1 = create_node n3 15 n4 in
+  let n2 = create_node n5 30 n6 in
+
+  let root = create_node n1 45 n2 in
+
+  assert (not (is_gdbh root));
+
+(*
+                   (root, 36)
+                 /            \
+          (n1, 10)           (n2, 26)
+          /      \           /      \
+     (n3, 3)  (n4, 7)  (n5, 11)  (n6, 15)
+      /   \     /   \     /   \    /   \
+    (1)   (2) (3)  (4)  (5)  (6) (7)  (8)
+   *)
+
+  let l1 = create_leaf (Char 'a') 1 in
+  let l2 = create_leaf (Char 'b') 2 in
+  let l3 = create_leaf (Char 'c') 3 in
+  let l4 = create_leaf (Char 'd') 4 in
+  let l5 = create_leaf (Char 'e') 5 in
+  let l6 = create_leaf (Char 'f') 6 in
+  let l7 = create_leaf (Char 'g') 7 in
+  let l8 = create_leaf (Char 'h') 8 in
+
+  let n3 = create_node l1 3 l2 in
+  let n4 = create_node l3 7 l4 in
+  let n5 = create_node l5 11 l6 in
+  let n6 = create_node l7 15 l8 in
+
+  let n1 = create_node n3 10 n4 in
+  let n2 = create_node n5 26 n6 in
+
+  let root = create_node n1 36 n2 in
+
+  assert (not (is_gdbh root));
+
+  (*
+                   (root, 36)
+                 /            \
+          (n1, 10)           (n2, 26)
+          /      \           /      \
+     (n3, 3)  (n4, 7)  (n5, 11)  (n6, 15)
+      /   \     /   \     /   \    /   \
+    (1)   (2) (3)  (4)  (5)  (6) (7)  (8)
+   *)
+
+  let l1 = create_leaf (Char 'a') 1 in
+  let l2 = create_leaf (Char 'b') 2 in
+  let l3 = create_leaf (Char 'c') 3 in
+  let l4 = create_leaf (Char 'd') 4 in
+  let l5 = create_leaf (Char 'e') 5 in
+  let l6 = create_leaf (Char 'f') 6 in
+  let l7 = create_leaf (Char 'g') 7 in
+  let l8 = create_leaf (Char 'h') 8 in
+
+  let n3 = create_node l1 3 l2 in
+  let n4 = create_node l3 7 l4 in
+  let n5 = create_node l5 11 l6 in
+  let n6 = create_node l7 15 l8 in
+
+  let n1 = create_node n3 10 n4 in
+  let n2 = create_node n5 26 n6 in
+
+  let root = create_node n1 36 n2 in
+
+  assert (not (is_gdbh root));
+
+  (*
+                   (root, 768)
+                 /            \
+          (n1, 256)           (n2, 512)
+          /      \           /      \
+     (n3, 128)  (n4, 128) (n5, 256) (n6, 256)
+      /   \     /   \     /   \    /   \
+    (64)  (64) (64) (64) (128)(128)(128)(128)
+   *)
+
+  let l1 = create_leaf (Char 'a') 64 in
+  let l2 = create_leaf (Char 'b') 64 in
+  let l3 = create_leaf (Char 'c') 64 in
+  let l4 = create_leaf (Char 'd') 64 in
+  let l5 = create_leaf (Char 'e') 128 in
+  let l6 = create_leaf (Char 'f') 128 in
+  let l7 = create_leaf (Char 'g') 128 in
+  let l8 = create_leaf (Char 'h') 128 in
+
+  let n3 = create_node l1 128 l2 in
+  let n4 = create_node l3 128 l4 in
+  let n5 = create_node l5 256 l6 in
+  let n6 = create_node l7 256 l8 in
+
+  let n1 = create_node n3 256 n4 in
+  let n2 = create_node n5 512 n6 in
+
+  let root = create_node n1 768 n2 in
+
+  assert (is_gdbh root);
+;;
+
+
 (* Appeler cette fonction pour executer les tests *)
 let test_primitive_ () =
   Printf.printf "\n___ Lancement des tests de test_primitive.ml ___\n";
@@ -414,7 +838,9 @@ let test_primitive_ () =
     test_finBloc_ ();
     test_switch_ ();
     test_update_weights_ ();
-    (* test_max_t_ (); *)
+    test_insert_ ();
+    test_is_adding_up_ ();
+    test_is_gdbh_ ();
     
     Printf.printf "___ Tous les tests de test_primitive.ml sont passés ___\n"
   with e -> Printf.printf "_Un test de test_primitive.ml n'est pas passé : \n%s\n" (Printexc.to_string e);

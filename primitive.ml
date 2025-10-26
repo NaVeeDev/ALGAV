@@ -71,10 +71,12 @@ let is_gdbh (t : btree) : bool =
     | x :: ll -> let is_gd = is_sorted x in
                  let is_bh = match last_of_prev_list with
                  | None -> true
-                 | Some prev_v -> prev_v <= List.hd x in
+                 | Some prev_v -> 
+                  (prev_v <= List.hd x )
+                 in
                  is_gd && is_bh && loop (Some (List.hd (List.rev x))) ll
   in
-  loop None lvl
+  loop None (List.rev lvl)
 
 let is_adding_up (t : btree) : bool =
   let rec loop t =
