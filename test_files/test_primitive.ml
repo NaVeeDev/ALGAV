@@ -827,6 +827,74 @@ let test_is_gdbh_ () =
   assert (is_gdbh root);
 ;;
 
+let test_btree_equality_ () = 
+   let tree = {content = Leaf (EmptyChar, 0)} in 
+   let table = CharaMap.empty in 
+   let table = CharaMap.add EmptyChar tree table in
+
+   assert (tree.content = (CharaMap.find EmptyChar table).content);
+
+   let table = insert table 'a' in 
+   let table = insert table 'a' in 
+   let table = insert table 'b' in 
+   let table = insert table 'b' in 
+   let table = insert table 'c' in 
+   let table = insert table 'd' in 
+   let table = insert table 'd' in 
+   let table = insert table 'd' in 
+   let table = insert table 'a' in 
+   let table = insert table 'e' in 
+   let table = insert table 'f' in 
+   let table = insert table 'e' in 
+   let table = insert table 'g' in 
+
+   let rec equal b1 b2 =
+      match b1.content, b2.content with 
+      | Leaf (c, i), Leaf (c2, i2) -> (c=c2) && (i=i2);
+      | Node (e1, i, e2), Node (e11, ii, e22) -> i=ii && equal e1 e11 && equal e2 e22;
+      | _ -> false
+   in
+
+   let rec find_btree btree e =
+      if equal btree e then Some btree
+      else
+         match btree.content with 
+         | Node (e1, _, e2) -> 
+            (
+               match find_btree e1 e with 
+               | None -> find_btree e2 e
+               | Some i -> Some i
+            )
+         | _ -> None
+   in
+
+   
+   let rec loop btree = 
+      (match btree.content with 
+      | Leaf (chara, _) -> 
+         (match chara with 
+         | EmptyChar -> assert (btree.content = (CharaMap.find EmptyChar table).content)
+         | Char c -> assert (btree.content = (CharaMap.find (Char c) table).content)
+         );
+      | Node (e1, _, e2) ->
+         loop e1;
+         loop e2;
+         (match find_btree tree btree with 
+         | None -> assert false;
+         | Some b -> assert (b.content = btree.content));
+      );
+      ()
+   in
+
+   loop tree;
+   ()
+;;
+
+
+let test_parent_ () =
+   
+;;
+
 
 (* Appeler cette fonction pour executer les tests *)
 let test_primitive_ () =
@@ -841,6 +909,13 @@ let test_primitive_ () =
     test_insert_ ();
     test_is_adding_up_ ();
     test_is_gdbh_ ();
+    test_btree_equality_ ();
+    test_parent_ ();
+    (*
+    modification 
+    chemin
+    traitement 
+     *)
     
     Printf.printf "___ Tous les tests de test_primitive.ml sont passés ___\n"
   with e -> Printf.printf "_Un test de test_primitive.ml n'est pas passé : \n%s\n" (Printexc.to_string e);
