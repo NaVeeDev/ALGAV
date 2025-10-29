@@ -133,6 +133,14 @@ val parent : btree -> btree -> btree
 *)
 val chemin : btree -> btree -> btree list
 
+(** [is_incrementable t l] vérifie si la liste de nœuds [l] est incrémentable dans l'arbre [t].
+
+    @param t l'arbre dans lequel on vérifie l'incrémentabilité.
+    @param l la liste de nœuds à vérifier.
+    @return true si la liste est incrémentable, false sinon.
+*)
+val is_incrementable : btree -> btree list -> bool
+
 (** [modification _H _table s] modifie l'arbre [_H] en insérant le caractère [s] dans la table [_table].
 
     @param _H l'arbre à modifier.
@@ -140,3 +148,13 @@ val chemin : btree -> btree -> btree list
     @param s le caractère à insérer.
     @return la table mise à jour.
 *)
+val modification : btree -> btreeTable -> char -> btreeTable
+
+(** [traitement _H _Q _table] traite les nœuds [_H] et [_Q] dans la table [_table].
+
+    @param _H le premier nœud à traiter.
+    @param _Q le deuxième nœud à traiter.
+    @param _table le dictionnaire correspondant aux nœuds.
+    @return la table mise à jour.
+*)
+val traitement : btree -> btree -> btreeTable -> btreeTable
