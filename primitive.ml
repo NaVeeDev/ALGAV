@@ -173,3 +173,21 @@ let parent (t : btree) (t_child : btree) : btree =
   match loop t with
   | None -> failwith "No parent found"
   | Some p -> p
+
+
+let chemin (t : btree) (t_end : btree) : btree list =
+  let rec loop curr acc = 
+    if curr == t_end then Some (curr :: acc)
+    else
+      match curr.content with
+      | Leaf (_, _) -> None
+      | Node (l, _, r) ->
+        match loop l (curr :: acc) with
+        | Some path -> Some path
+        | None -> loop r (curr :: acc)
+  in
+  match loop t [] with
+  | None -> failwith "No path found"
+  | Some path -> path
+
+  

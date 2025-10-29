@@ -124,3 +124,11 @@ val finBloc : btree -> btree -> btree
     @return le nœud parent de [t_child].
 *)
 val parent : btree -> btree -> btree
+
+(** [chemin t t_end] renvoie le chemin de [t_end] à [t] (la racine) dans l'arbre [t].
+
+    @param t l'arbre dans lequel on cherche le chemin.
+    @param t_end le nœud de fin du chemin.
+    @return la liste des nœuds du chemin de [t_end] à [t].
+*)
+val chemin : btree -> btree -> btree list
