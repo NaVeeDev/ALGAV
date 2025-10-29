@@ -159,33 +159,6 @@ let finBloc (h : btree) (m : btree) : btree =
   match o with 
   | None -> failwith "isn't supposed to happen"
   | Some (res, _) -> res
-
-let modification (_H : btree) (_table : btreeTable) (s : char) : btreeTable =
-  match _H.content with 
-  | Leaf (EmptyChar, _) -> 
-    insert _table s
-  | _ ->
-    if (not (mem (Char s) _table)) then 
-      let _Q = parent _H (CharaMap.find EmptyChar _table) in 
-      let _table = insert _table s in 
-      traitement _H _Q
-    else
-      let _Q = CharaMap.find (Char s) _table in 
-      let parent = parent _Q in 
-      match parent.content with
-      | Node ({content = Leaf(EmptyChar, _)}, _, _) -> (
-        let finB = finBloc _H _Q in 
-        if parent.content = finB.content then 
-          ((match _Q.content with 
-          | Node (e1, i, e2) -> _Q.content <- Node (e1, i + 1, e2)
-          | _ -> failwith "shouldn't happen"
-          );
-          let _Q = parent in
-          traitement _H _Q)
-        else 
-          traitement _H _Q
-      )
-      | _ -> traitement _H _Q
       
 let parent (t : btree) (t_child : btree) : btree =
   let rec loop curr =
@@ -217,4 +190,30 @@ let chemin (t : btree) (t_end : btree) : btree list =
   | None -> failwith "No path found"
   | Some path -> path
 
+let modification (_H : btree) (_table : btreeTable) (s : char) : btreeTable =
+match _H.content with 
+| Leaf (EmptyChar, _) -> 
+  insert _table s
+| _ ->
+  if (not (mem (Char s) _table)) then 
+    let _Q = parent _H (CharaMap.find EmptyChar _table) in 
+    let _table = insert _table s in 
+    traitement _H _Q
+  else
+    let _Q = CharaMap.find (Char s) _table in 
+    let parent = parent _Q in 
+    match parent.content with
+    | Node ({content = Leaf(EmptyChar, _)}, _, _) -> (
+      let finB = finBloc _H _Q in 
+      if parent.content = finB.content then 
+        ((match _Q.content with 
+        | Node (e1, i, e2) -> _Q.content <- Node (e1, i + 1, e2)
+        | _ -> failwith "shouldn't happen"
+        );
+        let _Q = parent in
+        traitement _H _Q)
+      else 
+        traitement _H _Q
+    )
+    | _ -> traitement _H _Q
   

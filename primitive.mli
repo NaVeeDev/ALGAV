@@ -132,3 +132,11 @@ val parent : btree -> btree -> btree
     @return la liste des nœuds du chemin de [t_end] à [t].
 *)
 val chemin : btree -> btree -> btree list
+
+(** [modification _H _table s] modifie l'arbre [_H] en insérant le caractère [s] dans la table [_table].
+
+    @param _H l'arbre à modifier.
+    @param _table le dictionnaire correspondant à l'arbre.
+    @param s le caractère à insérer.
+    @return la table mise à jour.
+*)
