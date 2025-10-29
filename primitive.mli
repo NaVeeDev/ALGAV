@@ -75,7 +75,7 @@ val is_adding_up : btree -> bool
 (** [insert t c] insert dans l'arbre [t] le noeud dont la clé est [c] et la valeur 1.
     Si [c] est déjà présente dans l'arbre, la valeur du noeud correspondant est incrémentée de 1.
 
-    @param bTab la map contenant les références aux btree..
+    @param bTab la map contenant les références aux btree.
     @param c la clé du nouveau noeud.
     @return la table mise à jour.
 *)
@@ -116,3 +116,11 @@ val switch : btree -> btree -> unit
     @return le nœud [b] tel que W (xm) = W (xm+1), ... = W (xb) et W (xb) < W (xb+1)
 *)
 val finBloc : btree -> btree -> btree 
+
+(** [parent t t_child] renvoie le nœud parent de [t_child] dans l'arbre [t].
+
+    @param t l'arbre dans lequel on cherche le parent.
+    @param t_child le nœud dont on cherche le parent.
+    @return le nœud parent de [t_child].
+*)
+val parent : btree -> btree -> btree

@@ -160,3 +160,16 @@ let finBloc (h : btree) (m : btree) : btree =
   | None -> failwith "isn't supposed to happen"
   | Some (res, _) -> res
 
+let parent (t : btree) (t_child : btree) : btree =
+  let rec loop curr =
+    match curr.content with
+    | Leaf (_, _) -> None
+    | Node (l, _, r) ->
+      if l == t_child || r == t_child then Some curr
+      else match loop l with
+      | None -> loop r
+      | Some _ as res -> res
+  in
+  match loop t with
+  | None -> failwith "No parent found"
+  | Some p -> p
