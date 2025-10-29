@@ -159,33 +159,6 @@ let finBloc (h : btree) (m : btree) : btree =
   match o with 
   | None -> failwith "isn't supposed to happen"
   | Some (res, _) -> res
-
-let modification (_H : btree) (_table : btreeTable) (s : char) : btreeTable =
-  match _H.content with 
-  | Leaf (EmptyChar, _) -> 
-    insert _table s
-  | _ ->
-    if (not (mem (Char s) _table)) then 
-      let _Q = parent _H (CharaMap.find EmptyChar _table) in 
-      let _table = insert _table s in 
-      traitement _H _Q
-    else
-      let _Q = CharaMap.find (Char s) _table in 
-      let parent = parent _Q in 
-      match parent.content with
-      | Node ({content = Leaf(EmptyChar, _)}, _, _) -> (
-        let finB = finBloc _H _Q in 
-        if parent.content = finB.content then 
-          ((match _Q.content with 
-          | Node (e1, i, e2) -> _Q.content <- Node (e1, i + 1, e2)
-          | _ -> failwith "shouldn't happen"
-          );
-          let _Q = parent in
-          traitement _H _Q)
-        else 
-          traitement _H _Q
-      )
-      | _ -> traitement _H _Q
       
 let parent (t : btree) (t_child : btree) : btree =
   let rec loop curr =
@@ -200,3 +173,105 @@ let parent (t : btree) (t_child : btree) : btree =
   match loop t with
   | None -> failwith "No parent found"
   | Some p -> p
+
+
+let chemin (t : btree) (t_end : btree) : btree list =
+  let rec loop curr acc = 
+    if curr == t_end then Some (curr :: acc)
+    else
+      match curr.content with
+      | Leaf (_, _) -> None
+      | Node (l, _, r) ->
+        match loop l (curr :: acc) with
+        | Some path -> Some path
+        | None -> loop r (curr :: acc)
+  in
+  match loop t [] with
+  | None -> failwith "No path found"
+  | Some path -> path
+
+let is_incrementable (t : btree) (l : btree list) : bool =
+  let rec loop lst =
+    match lst with
+    | [] | [_] -> true
+    | t1 :: t2 :: rest ->
+      let p = parent t t1 in
+      match p.content with
+      | Node (_, weight, _) ->
+        if is_lte t2 (weight - 1) then loop (t2 :: rest)
+        else false
+      | Leaf (_, _) -> false
+  in
+  loop l
+
+let rec traitement (_H : btree) (_Q : btree) (t : btreeTable) : btreeTable =
+  let chemin = chemin _H _Q in
+  if is_incrementable _H chemin then 
+    let rec increment l =
+      match l with 
+      | [] -> ()
+      | x :: ll -> match x.content with 
+        | Node (e1, i, e2) -> x.content <- Node (e1, i + 1, e2); increment ll
+        | Leaf (_, i ) -> x.content <- Leaf (Char (match x.content with Leaf (Char c, _) -> c | _ -> failwith "shouldn't happen"), i + 1); increment ll
+    in
+    increment chemin;
+    update_weights _H;
+    t
+  else
+    let same_weight_node path = 
+      let rec loop l : btree = 
+        match l with
+        | [] -> failwith "shouldn't happen"
+        | [x] -> x
+        | x :: y :: ll ->
+          match x.content, y.content with
+          | Node (_, w1, _), Node (_, w2, _) | Leaf(_, w1), Node(_,w2,_)-> if w1 = w2 then x else loop (y :: ll)
+          | Node (_, w1, _), Leaf(_, w2) | Leaf(_, w1), Leaf(_, w2) -> failwith "shouldn't happen"
+        in
+        loop path
+      in
+      let m = same_weight_node chemin in
+      let b = finBloc _H m in
+      let increment_until l stop =
+        let rec loop lst =
+          match lst with
+          | [] -> ()
+          | x :: ll -> if x == stop then ()
+            else (match x.content with 
+              | Node (e1, i, e2) -> x.content <- Node (e1, i + 1, e2); loop ll
+              | Leaf (_, i ) -> x.content <- Leaf (Char (match x.content with Leaf (Char c, _) -> c | _ -> failwith "shouldn't happen"), i + 1); loop ll)
+        in
+        loop l
+      in
+    increment_until chemin m;
+    switch b m;
+    update_weights _H;
+    traitement _H (parent _H _Q) t
+
+let modification (_H : btree) (_table : btreeTable) (s : char) : btreeTable =
+match _H.content with 
+| Leaf (EmptyChar, _) -> 
+  insert _table s
+| _ ->
+  if (not (mem (Char s) _table)) then 
+    let _Q = parent _H (CharaMap.find EmptyChar _table) in 
+    let _table = insert _table s in 
+    traitement _H _Q _table
+  else
+    let _Q = CharaMap.find (Char s) _table in 
+    let parent = parent _H _Q in 
+    match parent.content with
+    | Node ({content = Leaf(EmptyChar, _)}, _, _) -> (
+      let finB = finBloc _H _Q in 
+      if parent.content = finB.content then 
+        ((match _Q.content with 
+        | Node (e1, i, e2) -> _Q.content <- Node (e1, i + 1, e2)
+        | _ -> failwith "shouldn't happen"
+        );
+        let _Q = parent in
+        traitement _H _Q _table)
+      else 
+        traitement _H _Q _table
+    )
+    | _ -> traitement _H _Q _table
+  
