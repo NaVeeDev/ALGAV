@@ -101,13 +101,14 @@ val mem : chara -> btreeTable -> bool
 *)
 val update_weights : btree -> unit 
 
-(** [switch t1 t2] échange l'emplacement des noeuds [t1] et [t2].
+(** [switch table t1 t2] échange l'emplacement des noeuds [t1] et [t2], et met à jour [table].
 
+    @parem table le tableau des feuilles
     @param t1 le premier noeud à échanger.
     @param t2 le deuxième noeud à échanger.
     @return l'arbre [t] avec les noeuds [t1] et [t2] échangés.
 *)
-val switch : btree -> btree -> unit
+val switch : btreeTable -> btree -> btree -> btreeTable
 
 (** [finBloc h m] étant donné un nœud [m] numéroté xm dans un AHA [h], renvoie le nœud [b] tel que W (xm) = W (xm+1), ... = W (xb) et W (xb) < W (xb+1).
 
@@ -139,11 +140,10 @@ val chemin : btree -> btree -> btree list
     @param l la liste de nœuds à vérifier.
     @return true si la liste est incrémentable, false sinon.
 *)
-val is_incrementable : btree -> btree list -> bool
+val is_incrementable : btree list -> bool
 
 (** [modification _H _table s] modifie l'arbre [_H] en insérant le caractère [s] dans la table [_table].
 
-    @param _H l'arbre à modifier.
     @param _table le dictionnaire correspondant à l'arbre.
     @param s le caractère à insérer.
     @return la table mise à jour.

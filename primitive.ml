@@ -108,10 +108,21 @@ let insert (bTab : btreeTable) (c : char) : btreeTable =
     | Leaf (_, i) -> 
       btree.content <- Leaf(Char c, (i+1));
       bTab
-    | _ -> failwith "shouldn't happen"
+    | _ -> failwith "shouldn't happen1"
 ;;
 
-let print_btree (t : btree) : unit = failwith "Not yet implemented"
+let print_btree (t : btree) : unit = 
+  let rec to_string btree = 
+    match btree.content with 
+    | Leaf (EmptyChar, i) -> "Leaf(#, " ^ (Int.to_string i) ^ ")"
+    | Leaf (Char c, i) -> 
+      let res = "Leaf(" ^ (String.make 1 c) ^ ", " ^ (Int.to_string i) ^ ")" in res 
+    | Node (e1, i, e2) ->
+      let s1 = to_string e1 in 
+      let s2 = to_string e2 in 
+      "Node("^s1^", " ^ (Int.to_string i) ^ ", " ^s2^")"
+  in 
+  Printf.printf "%s\n" (to_string t)
 
 let rec mem (c : chara) (m : btreeTable) : bool =
   CharaMap.mem c m
@@ -131,10 +142,23 @@ let update_weights (t : btree) : unit =
       in
     loop t
 
-let switch (t1 : btree) (t2 : btree) =
+let switch (table : btreeTable) (t1 : btree) (t2 : btree) : btreeTable =
   let temp = t1.content in 
   t1.content <- t2.content;
-  t2.content <- temp
+  t2.content <- temp;
+  (match t1.content, t2.content with 
+  | Leaf (c1, i1), Leaf (c2, i2) -> (
+    let table = CharaMap.add c1 t1 table in 
+    let table = CharaMap.add c2 t2 table in 
+    table
+  )
+  | Leaf (c1, i1), _ -> (
+    CharaMap.add c1 t1 table
+  )
+  | _, Leaf (c2, i2) -> (
+    CharaMap.add c2 t2 table
+  )
+  | _ -> table)
 
 let finBloc (h : btree) (m : btree) : btree =
   let p = 
@@ -159,13 +183,16 @@ let finBloc (h : btree) (m : btree) : btree =
   match o with 
   | None -> failwith "isn't supposed to happen"
   | Some (res, _) -> res
+
+let rec equal_btree (t1 : btree) (t2 : btree) : bool =
+  t1.content = t2.content
       
 let parent (t : btree) (t_child : btree) : btree =
   let rec loop curr =
     match curr.content with
     | Leaf (_, _) -> None
     | Node (l, _, r) ->
-      if l == t_child || r == t_child then Some curr
+      if equal_btree l t_child || equal_btree r t_child then Some curr
       else match loop l with
       | None -> loop r
       | Some _ as res -> res
@@ -177,7 +204,8 @@ let parent (t : btree) (t_child : btree) : btree =
 
 let chemin (t : btree) (t_end : btree) : btree list =
   let rec loop curr acc = 
-    if curr == t_end then Some (curr :: acc)
+    if equal_btree curr t_end then
+      Some (curr :: acc)
     else
       match curr.content with
       | Leaf (_, _) -> None
@@ -190,29 +218,30 @@ let chemin (t : btree) (t_end : btree) : btree list =
   | None -> failwith "No path found"
   | Some path -> path
 
-let is_incrementable (t : btree) (l : btree list) : bool =
+let is_incrementable (l : btree list) : bool =
   let rec loop lst =
     match lst with
     | [] | [_] -> true
     | t1 :: t2 :: rest ->
-      let p = parent t t1 in
-      match p.content with
-      | Node (_, weight, _) ->
-        if is_lte t2 (weight - 1) then loop (t2 :: rest)
-        else false
-      | Leaf (_, _) -> false
+      (match t1.content, t2.content with
+      | Node (_, w1, _), Node (_,w2,_)|Leaf(_,w1),Node(_,w2,_) ->
+        Printf.printf "w1 : %d ; w2 : %d \n" w1 w2;
+        w1 < w2 && loop (t2 :: rest)
+      | _ -> false)
   in
   loop l
 
 let rec traitement (_H : btree) (_Q : btree) (t : btreeTable) : btreeTable =
   let chemin = chemin _H _Q in
-  if is_incrementable _H chemin then 
+  Printf.printf "CHEMIN : \n";
+  List.iter (fun e -> print_btree e) chemin; print_newline ();
+  if is_incrementable chemin then 
     let rec increment l =
       match l with 
       | [] -> ()
       | x :: ll -> match x.content with 
         | Node (e1, i, e2) -> x.content <- Node (e1, i + 1, e2); increment ll
-        | Leaf (_, i ) -> x.content <- Leaf (Char (match x.content with Leaf (Char c, _) -> c | _ -> failwith "shouldn't happen"), i + 1); increment ll
+        | Leaf (_, i ) -> x.content <- Leaf (Char (match x.content with Leaf (Char c, _) -> c | _ -> failwith "shouldn't happen2"), i + 1); increment ll
     in
     increment chemin;
     update_weights _H;
@@ -221,52 +250,62 @@ let rec traitement (_H : btree) (_Q : btree) (t : btreeTable) : btreeTable =
     let same_weight_node path = 
       let rec loop l : btree = 
         match l with
-        | [] -> failwith "shouldn't happen"
+        | [] -> failwith "shouldn't happen3"
         | [x] -> x
         | x :: y :: ll ->
           match x.content, y.content with
           | Node (_, w1, _), Node (_, w2, _) | Leaf(_, w1), Node(_,w2,_)-> if w1 = w2 then x else loop (y :: ll)
-          | Node (_, w1, _), Leaf(_, w2) | Leaf(_, w1), Leaf(_, w2) -> failwith "shouldn't happen"
-        in
-        loop path
+          | Node (_, w1, _), Leaf(_, w2) | Leaf(_, w1), Leaf(_, w2) -> failwith "shouldn't happen4"
       in
-      let m = same_weight_node chemin in
-      let b = finBloc _H m in
-      let increment_until l stop =
-        let rec loop lst =
-          match lst with
-          | [] -> ()
-          | x :: ll -> if x == stop then ()
-            else (match x.content with 
-              | Node (e1, i, e2) -> x.content <- Node (e1, i + 1, e2); loop ll
-              | Leaf (_, i ) -> x.content <- Leaf (Char (match x.content with Leaf (Char c, _) -> c | _ -> failwith "shouldn't happen"), i + 1); loop ll)
-        in
-        loop l
+      loop path
+    in
+    let m = same_weight_node chemin in
+    Printf.printf "m : "; print_btree m; print_newline ();
+    let b = finBloc _H m in
+    Printf.printf "b : "; print_btree b; print_newline ();
+    let increment_until l stop =
+      let rec loop lst =
+        match lst with
+        | [] -> ()
+        | x :: ll -> if equal_btree x stop then
+              (match x.content with 
+            | Node (e1, i, e2) -> x.content <- Node (e1, i + 1, e2); 
+            | Leaf (_, i ) -> x.content <- Leaf (Char (match x.content with Leaf (Char c, _) -> c | _ -> failwith "shouldn't happen5"), i + 1))
+          else (match x.content with 
+            | Node (e1, i, e2) -> x.content <- Node (e1, i + 1, e2); loop ll
+            | Leaf (_, i ) -> x.content <- Leaf (Char (match x.content with Leaf (Char c, _) -> c | _ -> failwith "shouldn't happen5"), i + 1); loop ll)
       in
+      loop l
+    in
     increment_until chemin m;
-    switch b m;
+    let t = switch t b m in
     update_weights _H;
     traitement _H (parent _H _Q) t
 
 let modification (_H : btree) (_table : btreeTable) (s : char) : btreeTable =
 match _H.content with 
 | Leaf (EmptyChar, _) -> 
+  (* H == # *)
   insert _table s
 | _ ->
   if (not (mem (Char s) _table)) then 
+    (* s not in H *)
     let _Q = parent _H (CharaMap.find EmptyChar _table) in 
     let _table = insert _table s in 
+    Printf.printf "_Q : "; print_btree _Q; print_newline ();
     traitement _H _Q _table
   else
+    (* else *)
     let _Q = CharaMap.find (Char s) _table in 
     let parent = parent _H _Q in 
     match parent.content with
     | Node ({content = Leaf(EmptyChar, _)}, _, _) -> (
       let finB = finBloc _H _Q in 
-      if parent.content = finB.content then 
+      if equal_btree parent finB then 
+        (* if ( enfants(parent(Q)) == {#, Q} and parent(Q) == finBloc(H,Q) ) *)
         ((match _Q.content with 
-        | Node (e1, i, e2) -> _Q.content <- Node (e1, i + 1, e2)
-        | _ -> failwith "shouldn't happen"
+        | Node (e1, i, e2) -> _Q.content <- Node (e1, i+1, e2)
+        | Leaf (o, i) -> _Q.content <- Leaf (o, i+1)
         );
         let _Q = parent in
         traitement _H _Q _table)
