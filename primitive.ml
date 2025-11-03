@@ -63,6 +63,23 @@ let max_t (t : btree) : int =
   loop [t] []
 ;;
 
+let node_per_depth (t : btree ) : btree list list =
+  let rec loop curr acc =
+    match curr with
+    | [] -> acc
+    | _ ->
+      let vals, next =
+        List.fold_right (fun node (vals_acc, next_acc) ->
+          match node.content with
+          | Leaf _ -> (node :: vals_acc, next_acc)
+          | Node (l, _, r) -> (node :: vals_acc, l :: r :: next_acc)
+        ) curr ([], [])
+      in
+      loop next (vals :: acc)
+  in
+  loop [t] []
+;;
+
 let is_gdbh (t : btree) : bool = 
   let lvl = List.filter (fun l -> l <> []) (vals_per_depth t) in
   let rec loop last_of_prev_list l = 
@@ -185,7 +202,7 @@ let finBloc (h : btree) (m : btree) : btree =
   | Some (res, _) -> res
 
 let rec equal_btree (t1 : btree) (t2 : btree) : bool =
-  t1.content = t2.content
+  t1.content == t2.content
       
 let parent (t : btree) (t_child : btree) : btree =
   let rec loop curr =
@@ -198,7 +215,7 @@ let parent (t : btree) (t_child : btree) : btree =
       | Some _ as res -> res
   in
   match loop t with
-  | None -> failwith "No parent found"
+  | None -> raise Not_found (* No parent found *)
   | Some p -> p
 
 
@@ -218,24 +235,71 @@ let chemin (t : btree) (t_end : btree) : btree list =
   | None -> failwith "No path found"
   | Some path -> path
 
-let is_incrementable (l : btree list) : bool =
-  let rec loop lst =
-    match lst with
-    | [] | [_] -> true
-    | t1 :: t2 :: rest ->
-      (match t1.content, t2.content with
-      | Node (_, w1, _), Node (_,w2,_)|Leaf(_,w1),Node(_,w2,_) ->
-        Printf.printf "w1 : %d ; w2 : %d \n" w1 w2;
-        w1 < w2 && loop (t2 :: rest)
-      | _ -> false)
+let is_incrementable (t : btree) (l : btree list) : bool * btree option =
+  let npd = node_per_depth t in
+  let find_next_elem (target : btree) : btree option = 
+    let rec loop npd_ =
+      match npd_ with 
+      | current_npd :: npd_after -> (
+        let rec looper l = (
+          match l with 
+          | e :: ee :: ll -> 
+            (* ee est le next si e est target, sinon on continue la recherche *)
+            if equal_btree e target then Some ee
+            else looper (ee :: ll)
+          | e :: [] -> 
+            (* si target est au bout de la liste, le next est le premier elem de la profondeur d'au dessus *)
+            if equal_btree e target then
+              (
+                match npd_after with
+                | list :: _ -> (
+                  match list with 
+                  | e :: _ -> Some e 
+                  | _ -> failwith "Not supposed to happen 1"
+                )
+                | _ -> None
+              )
+            (* target n'est pas dans cette profondeur, on cherche dans les profondeurs plus hautes *)
+            else None
+          | [] -> None 
+        )
+        in 
+        (match looper current_npd with 
+          | None -> loop npd_after
+          | Some res -> Some res)
+      )
+      | _ -> None
+    in 
+    loop npd
   in
-  loop l
+  let rec check_node l =
+    match l with 
+    | e :: ll -> (
+      let next = find_next_elem e in 
+      match next with 
+      | None -> (true, None)
+      | Some next -> (
+        (* Printf.printf "next : "; print_btree next;
+        Printf.printf "e : "; print_btree e; print_newline (); *)
+        match next.content, e.content with 
+        | Node (_, highest, _), Node (_, lowest, _) | Node (_, highest, _), Leaf (_, lowest)
+        | Leaf (_, highest), Node (_, lowest, _) | Leaf (_, highest), Leaf (_, lowest) ->
+          if lowest < highest then 
+            check_node ll
+          else
+            (false, Some e)
+      )
+    )
+    | [] -> (true, None)
+  in
+  check_node l
 
 let rec traitement (_H : btree) (_Q : btree) (t : btreeTable) : btreeTable =
   let chemin = chemin _H _Q in
-  Printf.printf "CHEMIN : \n";
-  List.iter (fun e -> print_btree e) chemin; print_newline ();
-  if is_incrementable chemin then 
+  (* Printf.printf "CHEMIN : \n";
+  List.iter (fun e -> print_btree e) chemin; print_newline (); *)
+  let (is_incrementable, m_option) = is_incrementable _H chemin in
+  if is_incrementable then 
     let rec increment l =
       match l with 
       | [] -> ()
@@ -247,22 +311,8 @@ let rec traitement (_H : btree) (_Q : btree) (t : btreeTable) : btreeTable =
     update_weights _H;
     t
   else
-    let same_weight_node path = 
-      let rec loop l : btree = 
-        match l with
-        | [] -> failwith "shouldn't happen3"
-        | [x] -> x
-        | x :: y :: ll ->
-          match x.content, y.content with
-          | Node (_, w1, _), Node (_, w2, _) | Leaf(_, w1), Node(_,w2,_)-> if w1 = w2 then x else loop (y :: ll)
-          | Node (_, w1, _), Leaf(_, w2) | Leaf(_, w1), Leaf(_, w2) -> failwith "shouldn't happen4"
-      in
-      loop path
-    in
-    let m = same_weight_node chemin in
-    Printf.printf "m : "; print_btree m; print_newline ();
+    let m = match m_option with | None -> failwith "non sense" | Some e -> e in
     let b = finBloc _H m in
-    Printf.printf "b : "; print_btree b; print_newline ();
     let increment_until l stop =
       let rec loop lst =
         match lst with
@@ -279,8 +329,8 @@ let rec traitement (_H : btree) (_Q : btree) (t : btreeTable) : btreeTable =
     in
     increment_until chemin m;
     let t = switch t b m in
-    update_weights _H;
-    traitement _H (parent _H _Q) t
+    (* ici on utilise b plutot que m car b et m ont été switch (mais pas leur nom local, seulement les contenus) *)
+    traitement _H (parent _H b) t
 
 let modification (_H : btree) (_table : btreeTable) (s : char) : btreeTable =
 match _H.content with 
@@ -291,8 +341,7 @@ match _H.content with
   if (not (mem (Char s) _table)) then 
     (* s not in H *)
     let _Q = parent _H (CharaMap.find EmptyChar _table) in 
-    let _table = insert _table s in 
-    Printf.printf "_Q : "; print_btree _Q; print_newline ();
+    let _table = insert _table s in
     traitement _H _Q _table
   else
     (* else *)
@@ -303,12 +352,14 @@ match _H.content with
       let finB = finBloc _H _Q in 
       if equal_btree parent finB then 
         (* if ( enfants(parent(Q)) == {#, Q} and parent(Q) == finBloc(H,Q) ) *)
-        ((match _Q.content with 
-        | Node (e1, i, e2) -> _Q.content <- Node (e1, i+1, e2)
-        | Leaf (o, i) -> _Q.content <- Leaf (o, i+1)
-        );
-        let _Q = parent in
-        traitement _H _Q _table)
+        (
+          (match _Q.content with
+          | Leaf (c, i) -> _Q.content <- Leaf (c, i+1)
+          | Node (e1, i, e2) -> _Q.content <- Node (e1, i+1, e2)
+          ); 
+          let _Q = parent in
+          traitement _H _Q _table
+        )
       else 
         traitement _H _Q _table
     )

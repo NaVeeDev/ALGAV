@@ -58,6 +58,13 @@ val max_t : btree -> int
     à droite. Ainsi res.nth i correspond aux valeurs de [t] à la i-ème profondeur.*)
 val vals_per_depth : btree -> (int list) list
 
+(** [node_per_depth t] renvoie la liste de toutes les nodes de [t] niveau par niveau.
+
+    @param t l'arbre auquel on s'intéresse.
+    @return la liste de de toutes les nodes de [t] niveau par niveau, de gauche
+    à droite. Ainsi res.nth i correspond aux nodes de [t] à la (taille de [t] - i)ème profondeur.*)
+val node_per_depth : btree -> btree list list
+
 (** [is_gdbh t] indique si l'arbre donné [t] est bien un arbre qui suit la hierarchie gdbh.
 
     @param t l'arbre auquel on s'intéresse.
@@ -138,9 +145,9 @@ val chemin : btree -> btree -> btree list
 
     @param t l'arbre dans lequel on vérifie l'incrémentabilité.
     @param l la liste de nœuds à vérifier.
-    @return true si la liste est incrémentable, false sinon.
+    @return (true, None) si la liste est incrémentable, (false, m) sinon, m étant le premier element du chemin [l] tel que pds(m) == pds(m+1).
 *)
-val is_incrementable : btree list -> bool
+val is_incrementable : btree -> btree list -> bool * btree option
 
 (** [modification _H _table s] modifie l'arbre [_H] en insérant le caractère [s] dans la table [_table].
 

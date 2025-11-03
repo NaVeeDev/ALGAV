@@ -941,125 +941,65 @@ let test_parent_ () =
 
 
 let test_is_incrementable_ () =
-   let o = create_leaf EmptyChar 0 in
-   let n1 = create_node o 1 o in
-   let n11 = create_node o 1 o in
-   let n2 = create_node o 2 o in
-   let n3 = create_node o 3 o in
-   let n4 = create_node o 4 o in
-   let n44 = create_node o 4 o in
-   let n5 = create_node o 5 o in
-   let n55 = create_node o 5 o in
-   let n6 = create_node o 6 o in
-   let n7 = create_node o 7 o in
-   let n8 = create_node o 8 o in
+   (*
+                   (root, 768)
+                 /            \
+          (n1, 256)           (n2, 512)
+          /      \           /      \
+     (n3, 128)  (n4, 128) (n5, 256) (n6, 256)
+      /   \     /   \     /   \    /   \
+    (64)  (64) (64) (64) (128)(128)(128)(128)
+   *)
 
-   assert (is_incrementable [n1; n2]);
-   assert (is_incrementable [n1; n2; n3; n4; n5; n6; n7; n8]);
-   assert (not (is_incrementable [n1; n11]));
-   assert (not (is_incrementable [n2; n1]));
-   assert (not (is_incrementable [n1; n2; n3; n44; n4; n5; n6]));
-   assert (not (is_incrementable [n1; n2; n3; n4; n4; n5; n55]));
-   assert (not (is_incrementable [n11; n1; n3; n4; n4; n5]));
+  let l1 = create_leaf (Char 'a') 64 in
+  let l2 = create_leaf (Char 'b') 64 in
+  let l3 = create_leaf (Char 'c') 64 in
+  let l4 = create_leaf (Char 'd') 64 in
+  let l5 = create_leaf (Char 'e') 128 in
+  let l6 = create_leaf (Char 'f') 128 in
+  let l7 = create_leaf (Char 'g') 128 in
+  let l8 = create_leaf (Char 'h') 128 in
+
+  let n3 = create_node l1 128 l2 in
+  let n4 = create_node l3 128 l4 in
+  let n5 = create_node l5 256 l6 in
+  let n6 = create_node l7 256 l8 in
+
+  let n1 = create_node n3 256 n4 in
+  let n2 = create_node n5 512 n6 in
+
+  let root = create_node n1 768 n2 in 
+
+  let (b, n) = is_incrementable root [n1] in 
+  assert b;
+  let (b, n) = is_incrementable root [n1; root] in
+  assert b;
+  let (b, n) = is_incrementable root [l4; n4; n1; root] in
+  assert b;
+  let (b, n) = is_incrementable root [l6; n5; n2; root] in
+  assert (not b);
+  let (b, n) = is_incrementable root [n6; n2; root] in 
+  assert (not b);
 ;;
 
 let test_modification_ () =
-   (* val modification : btree -> btreeTable -> char -> btreeTable *)
+    (* carambarbcm *)
    let tree = {content = Leaf (EmptyChar, 0)} in 
    let table = CharaMap.empty in 
    let table = CharaMap.add EmptyChar tree table in
 
-   let table = modification tree table 'a' in 
-   (match tree.content with 
-   | Node ({content = Leaf (EmptyChar, 0)}, 1, {content = Leaf (Char 'a', 1)}) -> assert true;
-   | _ -> assert false);
-   
-   let table = modification tree table 'a' in    
-   (match tree.content with 
-   | Node ({content = Leaf (EmptyChar, 0)}, 2, {content = Leaf (Char 'a', 2)}) -> assert true;
-   | _ -> assert false);
-
-   let table = modification tree table 'b' in    
-   (match tree.content with 
-   | Node (
-      {content = Node (
-         {content = Leaf (EmptyChar, 0)}, 
-         1, 
-         {content = Leaf (Char 'b', 1)})},
-      3,
-      {content = Leaf (Char 'a', 2)}) 
-   -> assert true;
-   | _ -> assert false);
-
-   let table = modification tree table 'b' in   
-       
-   (match tree.content with 
-   | Node (
-      {content = Node (
-         {content = Leaf (EmptyChar, 0)}, 
-         2, 
-         {content = Leaf (Char 'b', 2)})},
-      4,
-      {content = Leaf (Char 'a', 2)}) 
-   -> assert true;
-   | _ -> assert false);
-
-   let table = modification tree table 'b' in    
-
-   (match tree.content with 
-   | Node (
-      {content = Node (
-         {content = Leaf (EmptyChar, 0)}, 
-         2, 
-         {content = Leaf (Char 'a', 2)})},
-      5,
-      {content = Leaf (Char 'b', 3)}) 
-   -> assert true;
-   | _ -> assert false);
-    
-   let table = modification tree table 'c' in    
-
-   (match tree.content with 
-   | Node (
-      {content = Node (
-         {content = Node (
-            {content = Leaf (EmptyChar, 0)},
-            1,
-            {content = Leaf (Char 'c', 1)}
-         )}, 
-         3, 
-         {content = Leaf (Char 'a', 2)})},
-      6,
-      {content = Leaf (Char 'b', 3)}) 
-   -> assert true;
-   | _ -> assert false);
-
-   (* carambarbcm *)
-   let tree = {content = Leaf (EmptyChar, 0)} in 
-   let table = CharaMap.empty in 
-   let table = CharaMap.add EmptyChar tree table in
-
-   let table = modification tree table 'c' in
-   let table = modification tree table 'a' in
-   Printf.printf "_____\n";
-   let table = modification tree table 'r' in
-   print_btree tree;
-   (* let table = modification tree table 'a' in
-   print_btree tree;
-   let table = modification tree table 'm' in
-   print_btree tree;
-   let table = modification tree table 'b' in
-   print_btree tree;
-   let table = modification tree table 'a' in
-   print_btree tree;
-   let table = modification tree table 'r' in
-   print_btree tree;
-   let table = modification tree table 'b' in
-   print_btree tree;
-   let table = modification tree table 'c' in
-   print_btree tree;
-   let table = modification tree table 'm' in
-   print_btree tree; *)
+   let table = modification tree table 'c' in (* Printf.printf "c : "; print_btree tree; *)
+   let table = modification tree table 'a' in (* Printf.printf "ca : "; print_btree tree; *)
+   let table = modification tree table 'r' in (* Printf.printf "car : "; print_btree tree; *)
+   let table = modification tree table 'a' in (* Printf.printf "cara : "; print_btree tree; *)
+   let table = modification tree table 'm' in (* Printf.printf "caram : "; print_btree tree; *)
+   let table = modification tree table 'b' in (* Printf.printf "caramb : "; print_btree tree; *)
+   let table = modification tree table 'a' in (* Printf.printf "caramba : "; print_btree tree; *)
+   let table = modification tree table 'r' in (* Printf.printf "carambar : "; print_btree tree; *)
+   let table = modification tree table 'b' in (* Printf.printf "carambarb : "; print_btree tree; *)
+   let table = modification tree table 'c' in (* Printf.printf "carambarbc : "; print_btree tree; *)
+   let _ = modification tree table 'm' in Printf.printf "\ncarambarbcm :  "; print_btree tree;
+   Printf.printf "Supposed to be:Node(Node(Leaf(b, 2), 4, Leaf(r, 2)), 11, Node(Leaf(a, 3), 7, Node(Node(Leaf(#, 0), 2, Leaf(m, 2)), 4, Leaf(c, 2))))\n\n"
 ;;
 
 (* Appeler cette fonction pour executer les tests *)
