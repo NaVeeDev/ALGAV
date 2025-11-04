@@ -17,8 +17,8 @@ let test_is_sorted_ () =
 (*##### FONCTIONS POUR LES ARBRES BINAIRES ####*)
 open Primitive
 
-let create_leaf chara i = { content = Leaf (chara, i) }
-let create_node b1 i b2 = { content = Node (b1, i, b2) }
+let create_leaf chara i = { content = Leaf (chara, i); parent = None }
+let create_node b1 i b2 = { content = Node (b1, i, b2); parent = None }
 
 
 let test_is_lte_ () =
@@ -226,86 +226,24 @@ let test_update_weights_ () =
 ;;
 
 let test_switch_ () =
-   let l1 = create_leaf (Char 'a') 1 in 
-   let l2 = create_leaf (Char 'b') 2 in 
-   let l3 = create_leaf (Char 'c') 3 in 
-   let n2 = create_node l1 3 l2 in
-   let n1 = create_node n2 6 l3 in 
-   let t = CharaMap.empty in 
-   let _ = switch t n2 l3 in
-   (match n1.content with 
-   | Node (e1, _, e2) ->
-      (match e1.content with 
-      | Leaf (_, i) -> assert (i = 3)
-      | _ -> assert false
-      );
-      (match e2.content with 
-      | Leaf _ -> assert false
-      | Node (_, i, _) -> assert (i = 3)
-      );
-   | _ -> assert false);
-   let _ = switch t n2 l3 in
-   (match n1.content with 
-   | Node (e1, _, e2) ->
-      (match e2.content with 
-      | Leaf (_, i) -> assert (i = 3)
-      | _ -> assert false
-      );
-      (match e1.content with 
-      | Leaf _ -> assert false
-      | Node (_, i, _) -> assert (i = 3)
-      );
-   | _ -> assert false);
-   let _ = switch t l2 l1 in
-   (match n2.content with 
-    | Leaf _ -> assert false
-    | Node (e1, _, e2) -> 
-      (match e1.content with
-      | Leaf (_, i) -> assert (i = 2)
-      | _ -> assert false
-      );
-      (match e2.content with
-      | Leaf (_, i) -> assert (i = 1)
-      | _ -> assert false
-      )
-   );
-   let _ = switch t l2 l1 in
-   (match n2.content with 
-    | Leaf _ -> assert false
-    | Node (e1, _, e2) -> 
-      (match e2.content with
-      | Leaf (_, i) -> assert (i = 2)
-      | _ -> assert false
-      );
-      (match e1.content with
-      | Leaf (_, i) -> assert (i = 1)
-      | _ -> assert false
-      )
-   );
-   let _ = switch t l1 l3 in 
-   (match n1.content with 
-   | Node (e1, _, e2) ->
-      (match e2.content with 
-      | Leaf (_, i) -> assert (i = 1)
-      | _ -> assert false
-      );
-      (match e1.content with
-      | Leaf _ -> assert false;
-      | Node (_, i, _) ->
-         assert (i=3);
-         assert (e1.content = n2.content)
-      )
-   | _ -> assert false;
-   );
-   (match n2.content with 
-    | Leaf _ -> assert false
-    | Node (e, _, _) -> 
-      (match e.content with
-      | Leaf (_, i) -> assert (i = 3)
-      | _ -> assert false
-      );
-   );
-   ()
+   let tree = {content = Leaf (EmptyChar, 0); parent = None} in 
+   let table = CharaMap.empty in 
+   let table = CharaMap.add EmptyChar tree table in
+
+   let table = modification tree table 'c' in
+   let table = modification tree table 'a' in 
+   let table = modification tree table 'r' in
+   let table = modification tree table 'a' in 
+   let table = modification tree table 'm' in 
+   let table = modification tree table 'b' in 
+   let table = modification tree table 'a' in 
+   let table = modification tree table 'r' in 
+   let table = modification tree table 'b' in 
+   let table = modification tree table 'c' in 
+   let table = modification tree table 't' in 
+   let _ = switch table (parent (CharaMap.find (Char 'r') table)) (parent (CharaMap.find (Char 'm') table)) in
+   Printf.printf "Supposed to be : Node(Node(Node(Leaf(#, 0), 1, Leaf(t, 1)), 2, Leaf(m, 1)), 11, Node(Leaf(a, 3), 7, Node(Node(Leaf(b, 2), 4, Leaf(r, 2)), 4, Leaf(c, 2))))"; print_newline ();
+   Printf.printf "Actual         : "; print_btree tree; print_newline ();
 ;;
 
 let test_finBloc_ () =
@@ -402,16 +340,19 @@ let test_finBloc_ () =
 
 
 let test_insert_ () =
-   let tree = {content = Leaf (EmptyChar, 0)} in 
+   let tree = {content = Leaf (EmptyChar, 0); parent = None} in 
    let table = CharaMap.empty in 
    let table = CharaMap.add EmptyChar tree table in
-
+   
    let table = insert table 'a' in 
    assert (mem (Char 'a') table);
+   
    let o = CharaMap.find_opt (Char 'a') table in 
    (match o with 
    | None -> assert false;
-   | Some btree -> (match btree.content with 
+   | Some btree -> 
+         assert (equal_btree tree (parent btree));
+         (match btree.content with 
                    | Leaf (chara, i) -> (match chara with 
                                    | EmptyChar -> assert false; 
                                    | Char c -> assert (c = 'a')
@@ -590,7 +531,7 @@ let test_insert_ () =
 
 
 let test_is_adding_up_ () = 
-   let tree = {content = Leaf (EmptyChar, 0)} in 
+   let tree = {content = Leaf (EmptyChar, 0); parent = None} in 
    let table = CharaMap.empty in 
    let table = CharaMap.add EmptyChar tree table in
 
@@ -829,7 +770,7 @@ let test_is_gdbh_ () =
 ;;
 
 let test_btree_equality_ () = 
-   let tree = {content = Leaf (EmptyChar, 0)} in 
+   let tree = {content = Leaf (EmptyChar, 0); parent = None} in 
    let table = CharaMap.empty in 
    let table = CharaMap.add EmptyChar tree table in
 
@@ -881,7 +822,7 @@ let test_btree_equality_ () =
          loop e2;
          (match find_btree tree btree with 
          | None -> assert false;
-         | Some b -> assert (b.content = btree.content));
+         | Some b -> assert (b.content == btree.content));
       );
       ()
    in
@@ -921,22 +862,39 @@ let test_parent_ () =
 
   let root = create_node n1 768 n2 in
 
-  assert (parent root l1 = n3);
-  assert (parent root l2 = n3);
-  assert (parent root l3 = n4);
-  assert (parent root l4 = n4);
-  assert (parent root l5 = n5);
-  assert (parent root l6 = n5);
-  assert (parent root l7 = n6);
-  assert (parent root l8 = n6);
-  
-  assert (parent root n3 = n1);
-  assert (parent root n4 = n1);
-  assert (parent root n5 = n2);
-  assert (parent root n6 = n2);
+  n1.parent <- Some root;
+  n2.parent <- Some root;
 
-  assert (parent root n1 = root);
-  assert (parent root n2 = root);
+  n3.parent <- Some n1;
+  n4.parent <- Some n1;
+  n5.parent <- Some n2;
+  n6.parent <- Some n2;
+
+  l1.parent <- Some n3;
+  l2.parent <- Some n3;
+  l3.parent <- Some n4;
+  l4.parent <- Some n4;
+  l5.parent <- Some n5;
+  l6.parent <- Some n5;
+  l7.parent <- Some n6;
+  l8.parent <- Some n6;
+
+  assert (equal_btree (parent l1) n3);
+  assert (equal_btree (parent l2) n3);
+  assert (equal_btree (parent l3) n4);
+  assert (equal_btree (parent l4) n4);
+  assert (equal_btree (parent l5) n5);
+  assert (equal_btree (parent l6) n5);
+  assert (equal_btree (parent l7) n6);
+  assert (equal_btree (parent l8) n6);
+  
+  assert (equal_btree (parent n3) n1);
+  assert (equal_btree (parent n4) n1);
+  assert (equal_btree (parent n5) n2);
+  assert (equal_btree (parent n6) n2);
+
+  assert (equal_btree (parent n1) root);
+  assert (equal_btree (parent n2) root);
 ;;
 
 
@@ -984,23 +942,47 @@ let test_is_incrementable_ () =
 
 let test_modification_ () =
     (* carambarbcm *)
-   let tree = {content = Leaf (EmptyChar, 0)} in 
+   let tree = {content = Leaf (EmptyChar, 0); parent = None} in 
    let table = CharaMap.empty in 
    let table = CharaMap.add EmptyChar tree table in
 
-   let table = modification tree table 'c' in (* Printf.printf "c : "; print_btree tree; *)
-   let table = modification tree table 'a' in (* Printf.printf "ca : "; print_btree tree; *)
-   let table = modification tree table 'r' in (* Printf.printf "car : "; print_btree tree; *)
-   let table = modification tree table 'a' in (* Printf.printf "cara : "; print_btree tree; *)
-   let table = modification tree table 'm' in (* Printf.printf "caram : "; print_btree tree; *)
-   let table = modification tree table 'b' in (* Printf.printf "caramb : "; print_btree tree; *)
-   let table = modification tree table 'a' in (* Printf.printf "caramba : "; print_btree tree; *)
-   let table = modification tree table 'r' in (* Printf.printf "carambar : "; print_btree tree; *)
-   let table = modification tree table 'b' in (* Printf.printf "carambarb : "; print_btree tree; *)
-   let table = modification tree table 'c' in (* Printf.printf "carambarbc : "; print_btree tree; *)
-   let _ = modification tree table 'm' in Printf.printf "\ncarambarbcm :  "; print_btree tree;
-   Printf.printf "Supposed to be:Node(Node(Leaf(b, 2), 4, Leaf(r, 2)), 11, Node(Leaf(a, 3), 7, Node(Node(Leaf(#, 0), 2, Leaf(m, 2)), 4, Leaf(c, 2))))\n\n"
+   let table = modification tree table 'c' in Printf.printf "c : "; print_btree tree; 
+   let table = modification tree table 'a' in Printf.printf "ca : "; print_btree tree;
+   let table = modification tree table 'r' in Printf.printf "car : "; print_btree tree;
+   let table = modification tree table 'a' in Printf.printf "cara : "; print_btree tree;
+   let table = modification tree table 'm' in Printf.printf "caram : "; print_btree tree;
+   let table = modification tree table 'b' in Printf.printf "caramb : "; print_btree tree;
+   let table = modification tree table 'a' in Printf.printf "caramba : "; print_btree tree;
+   let table = modification tree table 'r' in Printf.printf "carambar : "; print_btree tree;
+   let table = modification tree table 'b' in Printf.printf "carambarb : "; print_btree tree;
+   let table = modification tree table 'c' in Printf.printf "carambarbc : "; print_btree tree;
+   let _ = modification tree table 'm' in Printf.printf "\ncarambarbcm    : "; print_btree tree;
+   Printf.printf "Supposed to be : Node(Node(Leaf(b, 2), 4, Leaf(r, 2)), 11, Node(Leaf(a, 3), 7, Node(Node(Leaf(#, 0), 2, Leaf(m, 2)), 4, Leaf(c, 2))))\n\n"
 ;;
+
+let test_code_ () = 
+   let tree = {content = Leaf (EmptyChar, 0); parent = None} in 
+   let table = CharaMap.empty in 
+   let table = CharaMap.add EmptyChar tree table in
+
+   let table = modification tree table 'c' in 
+   let table = modification tree table 'a' in 
+   let table = modification tree table 'r' in 
+   let table = modification tree table 'a' in 
+   let table = modification tree table 'm' in 
+   let table = modification tree table 'b' in 
+   let table = modification tree table 'a' in 
+   let table = modification tree table 'r' in 
+   let table = modification tree table 'b' in 
+   let table = modification tree table 'c' in 
+   let table = modification tree table 'm' in 
+   
+   assert ((code (Char 'm') table) = [1; 1; 0; 1]);
+   assert ((code (Char 'b') table) = [0; 0]);
+   assert ((code (Char 'r') table) = [0; 1]);
+   assert ((code (Char 'a') table) = [1; 0]);
+   assert ((code (Char 'c') table) = [1; 1; 1]);
+   ()
 
 (* Appeler cette fonction pour executer les tests *)
 let test_primitive_ () =
@@ -1015,10 +997,11 @@ let test_primitive_ () =
     test_insert_ ();
     test_is_adding_up_ ();
     test_is_gdbh_ ();
-    test_btree_equality_ ();
     test_parent_ ();
     test_is_incrementable_ ();
-    test_modification_ ();
+    test_btree_equality_ ();
+    test_modification_ (); 
+    test_code_ ();
     
     Printf.printf "___ Tous les tests de test_primitive.ml sont passés ___\n"
   with e -> Printf.printf "_Un test de test_primitive.ml n'est pas passé : \n%s\n" (Printexc.to_string e);

@@ -16,7 +16,7 @@ val is_sorted : int list -> bool
 *)
 type chara = EmptyChar | Char of char
 type btree_ = Leaf of chara * int | Node of btree * int * btree
-and btree = {mutable content : btree_}
+and btree = {mutable content : btree_; mutable parent : btree option}
 
 (** [btreeTable] est la structure pour représenter la map qui associe des chara à un btree.
 *)
@@ -26,6 +26,14 @@ module CharaKey : sig
 end
 module CharaMap : Map.S with type key = CharaKey.t
 type btreeTable = btree CharaMap.t
+
+
+(** [equal_btree t1 t2] vérifie si [t1] et [t2] sont les même btree
+    
+    @param t1 le premier arbre auquel on s'intéresse.
+    @param t2 le deuxième arbre auquel on s'intéresse.
+    @return true si [t1] est [t2], false sinon. *)
+val equal_btree : btree ->  btree -> bool
 
 (** [is_lte t v] vérifie si toutes les valeurs de [t] sont inférieures ou égales
     à [v].
@@ -125,21 +133,19 @@ val switch : btreeTable -> btree -> btree -> btreeTable
 *)
 val finBloc : btree -> btree -> btree 
 
-(** [parent t t_child] renvoie le nœud parent de [t_child] dans l'arbre [t].
+(** [parent t t_child] renvoie le nœud parent de [t].
 
-    @param t l'arbre dans lequel on cherche le parent.
-    @param t_child le nœud dont on cherche le parent.
+    @param t le nœud dont on cherche le parent.
     @return le nœud parent de [t_child].
 *)
-val parent : btree -> btree -> btree
+val parent : btree -> btree
 
-(** [chemin t t_end] renvoie le chemin de [t_end] à [t] (la racine) dans l'arbre [t].
+(** [chemin t_end] renvoie le chemin de [t_end] jusqu'à la racine de l'arbre.
 
-    @param t l'arbre dans lequel on cherche le chemin.
     @param t_end le nœud de fin du chemin.
-    @return la liste des nœuds du chemin de [t_end] à [t].
+    @return la liste des nœuds du chemin de [t_end] à la racine.
 *)
-val chemin : btree -> btree -> btree list
+val chemin : btree -> btree list
 
 (** [is_incrementable t l] vérifie si la liste de nœuds [l] est incrémentable dans l'arbre [t].
 
@@ -165,3 +171,11 @@ val modification : btree -> btreeTable -> char -> btreeTable
     @return la table mise à jour.
 *)
 val traitement : btree -> btree -> btreeTable -> btreeTable
+
+(** [code chara table] renvoie le code de [chara] dans l'arbre représenté par [table]
+
+    @param chara le chara à traiter.
+    @param table le dictionnaire correspondant aux nœuds.
+    @return le code associé à [chara]
+*)
+val code : chara -> btreeTable -> int list

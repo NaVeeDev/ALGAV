@@ -10,7 +10,7 @@ let rec is_sorted (l : int list) : bool =
 
 type chara = EmptyChar | Char of char
 type btree_ = Leaf of chara * int | Node of btree * int * btree
-and btree = {mutable content : btree_}
+and btree = {mutable content : btree_; mutable parent : btree option}
 
 module CharaKey = struct
   type t = chara
@@ -110,24 +110,6 @@ let is_adding_up (t : btree) : bool =
       in
   loop t
 
-let insert (bTab : btreeTable) (c : char) : btreeTable = 
-  match (CharaMap.find_opt (Char c) bTab) with 
-  | None -> (*ajouter a la place de #*)
-    let hashtag = CharaMap.find EmptyChar bTab in 
-    let leaf1 = {content = Leaf(EmptyChar, 0)} in
-    let leaf2 = {content = Leaf(Char c, 1)} in
-    hashtag.content <- Node (leaf1, 1, leaf2);
-    let bTab = CharaMap.add EmptyChar leaf1 bTab in
-    let bTab = CharaMap.add (Char c) leaf2 bTab in
-    bTab
-  | Some btree -> (*incrémenter de 1*)
-    match btree.content with 
-    | Leaf (_, i) -> 
-      btree.content <- Leaf(Char c, (i+1));
-      bTab
-    | _ -> failwith "shouldn't happen1"
-;;
-
 let print_btree (t : btree) : unit = 
   let rec to_string btree = 
     match btree.content with 
@@ -140,6 +122,26 @@ let print_btree (t : btree) : unit =
       "Node("^s1^", " ^ (Int.to_string i) ^ ", " ^s2^")"
   in 
   Printf.printf "%s\n" (to_string t)
+
+let insert (bTab : btreeTable) (c : char) : btreeTable = 
+  match (CharaMap.find_opt (Char c) bTab) with 
+  | None -> (*ajouter a la place de #*)
+    let hashtag = CharaMap.find EmptyChar bTab in
+    let leaf1 = { content = Leaf (EmptyChar, 0); parent = None } in
+    let leaf2 = { content = Leaf (Char c, 1); parent = None } in
+    hashtag.content <- Node (leaf1, 1, leaf2);
+    leaf1.parent <- Some hashtag;
+    leaf2.parent <- Some hashtag;
+    let bTab = CharaMap.add EmptyChar leaf1 bTab in
+    let bTab = CharaMap.add (Char c) leaf2 bTab in
+    bTab
+  | Some btree -> (*incrémenter de 1*)
+    match btree.content with 
+    | Leaf (_, i) -> 
+      btree.content <- Leaf(Char c, (i+1));
+      bTab
+    | _ -> failwith "shouldn't happen1"
+;;
 
 let rec mem (c : chara) (m : btreeTable) : bool =
   CharaMap.mem c m
@@ -163,19 +165,30 @@ let switch (table : btreeTable) (t1 : btree) (t2 : btree) : btreeTable =
   let temp = t1.content in 
   t1.content <- t2.content;
   t2.content <- temp;
+  
   (match t1.content, t2.content with 
   | Leaf (c1, i1), Leaf (c2, i2) -> (
     let table = CharaMap.add c1 t1 table in 
     let table = CharaMap.add c2 t2 table in 
     table
   )
-  | Leaf (c1, i1), _ -> (
-    CharaMap.add c1 t1 table
+  | Leaf (c1, i1), Node (e1, i2, e2) -> (
+    e1.parent <- Some t1;  
+    e2.parent <- Some t1;  
+    CharaMap.add c1 t1 table;
   )
-  | _, Leaf (c2, i2) -> (
+  | Node (e1, i1, e2), Leaf (c2, i2) -> (
+    e1.parent <- Some t1;
+    e2.parent <- Some t1;
     CharaMap.add c2 t2 table
   )
-  | _ -> table)
+  | Node (e1, i1, e2), Node (ee1, i2, ee2) -> 
+    e1.parent <- Some t2;
+    e2.parent <- Some t2;
+    ee1.parent <- Some t1;  
+    ee2.parent <- Some t1;  
+    table)
+
 
 let finBloc (h : btree) (m : btree) : btree =
   let p = 
@@ -204,36 +217,21 @@ let finBloc (h : btree) (m : btree) : btree =
 let rec equal_btree (t1 : btree) (t2 : btree) : bool =
   t1.content == t2.content
       
-let parent (t : btree) (t_child : btree) : btree =
+let parent (t : btree) : btree =
+  match t.parent with 
+  | None -> raise Not_found
+  | Some node -> node
+
+
+let chemin (t_end : btree) : btree list =
   let rec loop curr =
-    match curr.content with
-    | Leaf (_, _) -> None
-    | Node (l, _, r) ->
-      if equal_btree l t_child || equal_btree r t_child then Some curr
-      else match loop l with
-      | None -> loop r
-      | Some _ as res -> res
+    match curr.parent with 
+    | None -> [curr]
+    | Some p -> 
+      curr :: (loop p)
   in
-  match loop t with
-  | None -> raise Not_found (* No parent found *)
-  | Some p -> p
+  loop t_end
 
-
-let chemin (t : btree) (t_end : btree) : btree list =
-  let rec loop curr acc = 
-    if equal_btree curr t_end then
-      Some (curr :: acc)
-    else
-      match curr.content with
-      | Leaf (_, _) -> None
-      | Node (l, _, r) ->
-        match loop l (curr :: acc) with
-        | Some path -> Some path
-        | None -> loop r (curr :: acc)
-  in
-  match loop t [] with
-  | None -> failwith "No path found"
-  | Some path -> path
 
 let is_incrementable (t : btree) (l : btree list) : bool * btree option =
   let npd = node_per_depth t in
@@ -279,8 +277,6 @@ let is_incrementable (t : btree) (l : btree list) : bool * btree option =
       match next with 
       | None -> (true, None)
       | Some next -> (
-        (* Printf.printf "next : "; print_btree next;
-        Printf.printf "e : "; print_btree e; print_newline (); *)
         match next.content, e.content with 
         | Node (_, highest, _), Node (_, lowest, _) | Node (_, highest, _), Leaf (_, lowest)
         | Leaf (_, highest), Node (_, lowest, _) | Leaf (_, highest), Leaf (_, lowest) ->
@@ -294,10 +290,23 @@ let is_incrementable (t : btree) (l : btree list) : bool * btree option =
   in
   check_node l
 
+let code (chara : chara) (table : btreeTable) : int list =
+  let node = CharaMap.find chara table in 
+  let rec loop n acc =
+    match n.parent with 
+    | None -> acc 
+    | Some p -> 
+      (match p.content with
+      | Node (e1, _, e2) -> 
+        let code = (if equal_btree e1 n then 0 else 1) in 
+        loop p (code :: acc)
+      | _ -> failwith "not happening"
+      )
+  in
+  loop node []
+
 let rec traitement (_H : btree) (_Q : btree) (t : btreeTable) : btreeTable =
-  let chemin = chemin _H _Q in
-  (* Printf.printf "CHEMIN : \n";
-  List.iter (fun e -> print_btree e) chemin; print_newline (); *)
+  let chemin = chemin _Q in
   let (is_incrementable, m_option) = is_incrementable _H chemin in
   if is_incrementable then 
     let rec increment l =
@@ -330,7 +339,7 @@ let rec traitement (_H : btree) (_Q : btree) (t : btreeTable) : btreeTable =
     increment_until chemin m;
     let t = switch t b m in
     (* ici on utilise b plutot que m car b et m ont été switch (mais pas leur nom local, seulement les contenus) *)
-    traitement _H (parent _H b) t
+    traitement _H (parent b) t
 
 let modification (_H : btree) (_table : btreeTable) (s : char) : btreeTable =
 match _H.content with 
@@ -340,13 +349,13 @@ match _H.content with
 | _ ->
   if (not (mem (Char s) _table)) then 
     (* s not in H *)
-    let _Q = parent _H (CharaMap.find EmptyChar _table) in 
+    let _Q = parent (CharaMap.find EmptyChar _table) in 
     let _table = insert _table s in
     traitement _H _Q _table
   else
     (* else *)
     let _Q = CharaMap.find (Char s) _table in 
-    let parent = parent _H _Q in 
+    let parent = parent _Q in 
     match parent.content with
     | Node ({content = Leaf(EmptyChar, _)}, _, _) -> (
       let finB = finBloc _H _Q in 
