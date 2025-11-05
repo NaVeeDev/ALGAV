@@ -374,3 +374,25 @@ match _H.content with
     )
     | _ -> traitement _H _Q _table
   
+
+(*##### FONCTION POUR LE CODE INITIAL ####*)
+(** DISCLAIMER : fortement inspiré de ce qui est proposé sur 
+    l'exemple de l'utilisation de Camomile :
+    https://ocaml.org/cookbook/utf8-text-processing/camomile
+*)
+
+open CamomileLibrary
+let initial_code (s : char) : int list = 
+  let bits_of_byte b =
+    let rec aux i acc =
+      if i < 0 then acc
+      else aux (i - 1) ((b lsr i) land 1 :: acc)
+    in
+    aux 7 []
+  in
+  let uchar = UTF8.get (String.make 1 s) 0 in
+  let encoded = UTF8.init 1 (fun _ -> uchar) in
+  let bytes = List.init (String.length encoded) (fun i -> Char.code encoded.[i]) in
+  List.flatten (List.map bits_of_byte bytes)
+
+

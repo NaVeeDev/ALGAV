@@ -179,3 +179,12 @@ val traitement : btree -> btree -> btreeTable -> btreeTable
     @return le code associé à [chara]
 *)
 val code : chara -> btreeTable -> int list
+
+(*##### FONCTION POUR LE CODE INITIAL ####*)
+(** [initial_code s] renvoie le code utf8 de [s] en format liste, chaque element de la
+    liste correspond à un bit du code.
+
+    @param s le caractère à traduire
+    @return la liste correspondant au code de [s]
+*)
+val initial_code : char -> int list
