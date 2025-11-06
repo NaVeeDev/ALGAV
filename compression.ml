@@ -1,23 +1,23 @@
 open Primitive
 
-let compression file =
+let compression input_file output_file=
     let _H = {content = Leaf (EmptyChar, 0); parent = None} in
     let table = CharaMap.empty in
     let table = CharaMap.add EmptyChar _H table in
     try 
-    let channel = Stdlib.open_in file in
-        let rec loop acc_code acc_table =
+    let in_channel = open_in input_file in
+    let out_channel = open_out output_file in
+        let rec loop acc_table =
             try 
-                let s = input_char channel in
+                let s = input_char in_channel in
                 let new_code =  if mem (Char s) acc_table then 
                     code (Char s) acc_table
                     else 
-                        try 
                             (code (EmptyChar) acc_table)@(initial_code s)
-                        with Not_found -> failwith "Read a character whose code was not given in the alphabet"
                     in
-                loop new_code (modification _H acc_table s)
-            with End_of_file -> close_in channel; acc_code
+                List.iter (fun bit -> output_string out_channel (string_of_int bit)) new_code;
+                loop (modification _H acc_table s)
+            with End_of_file -> close_in in_channel; close_out out_channel;
         in
-        loop [] table
-    with  Sys_error _ -> raise (Invalid_argument ("File not found: " ^ file))
+        loop table;
+    with  Sys_error _ -> raise (Invalid_argument ("File not found: " ^ input_file ^ " or " ^ output_file))

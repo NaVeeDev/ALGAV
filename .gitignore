@@ -8,6 +8,9 @@
 *.cmxs
 *.cmxa
 
+# WSL generated files
+*:Zone.Identifier
+
 # Files containing detailed information about the compilation (generated
 # by `ocamlc`/`ocamlopt` when invoked using the option `-bin-annot`).
 # These files are typically useful for code inspection tools
@@ -20,3 +23,5 @@
 # Local OPAM switch
 _opam/
 
+# MACOSX folder
+_MACOSX/
