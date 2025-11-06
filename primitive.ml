@@ -381,7 +381,7 @@ match _H.content with
     https://ocaml.org/cookbook/utf8-text-processing/camomile
 *)
 
-open CamomileLibrary
+open Camomile
 let initial_code (s : char) : int list = 
   let bits_of_byte b =
     let rec aux i acc =
