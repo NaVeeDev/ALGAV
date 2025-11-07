@@ -45,8 +45,8 @@ $(MAIN_EXEC): utils.cmi utils.cmx main.cmx
 	$(OCAMLOPT) $(OCAMLOPTFLAGS) utils.cmx main.cmx -o $@
 
 # Exécutable des tests
-$(TEST_EXEC): $(CMI) utils.cmx primitive.cmx $(TEST_DIR)/test_utils.cmx $(TEST_DIR)/test_primitive.cmx $(TEST_DIR)/test_primitive.cmx $(TEST_DIR)/test.cmx
-	$(OCAMLOPT) $(OCAMLOPTFLAGS) -o $@ utils.cmx primitive.cmx $(TEST_DIR)/test_utils.cmx $(TEST_DIR)/test_primitive.cmx $(TEST_DIR)/test_primitive.cmx $(TEST_DIR)/test.cmx
+$(TEST_EXEC): $(CMI) utils.cmx primitive.cmx compression.cmx $(TEST_DIR)/test_utils.cmx $(TEST_DIR)/test_primitive.cmx $(TEST_DIR)/test_compression.cmx $(TEST_DIR)/test.cmx
+	$(OCAMLOPT) $(OCAMLOPTFLAGS) -o $@ utils.cmx primitive.cmx compression.cmx $(TEST_DIR)/test_utils.cmx $(TEST_DIR)/test_primitive.cmx $(TEST_DIR)/test_compression.cmx $(TEST_DIR)/test.cmx
 
 # Lancer les tests
 test: $(TEST_EXEC)

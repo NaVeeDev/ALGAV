@@ -1,8 +1,8 @@
 open Compression
 
 let blaise_pascal_ () =
-  compression "ressources/Blaise_Pascal/Blaise_Pascal.txt";
-  failwith "TODO : must compare new created file with the one the prof gave us";
+  compression "test_files/ressources/Blaise_Pascal/Blaise_Pascal.txt" "test_files/ressources/Blaise_Pascal/test_compression_blaise_pascal.txt.huff";
+  ()
 ;;
 
 let test_compression_ () =

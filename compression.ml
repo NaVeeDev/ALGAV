@@ -1,6 +1,6 @@
 open Primitive
 
-let compression input_file output_file=
+let compression input_file output_file =
     let _H = {content = Leaf (EmptyChar, 0); parent = None} in
     let table = CharaMap.empty in
     let table = CharaMap.add EmptyChar _H table in
