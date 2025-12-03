@@ -387,6 +387,7 @@ match _H.content with
 
 (*##### FONCTION POUR LE CODE INITIAL ####*)
 
+
 let initial_code (s : Uchar.t) : int list =
   let buffer = Buffer.create 4 in
   Uutf.Buffer.add_utf_8 buffer s;
@@ -397,9 +398,8 @@ let initial_code (s : Uchar.t) : int list =
       if n < 0 then acc
       else aux (n-1) (Utils.nth_bit n byte :: acc)
     in
-    loop n [] 0
+    aux 7 []
   in
-
   let rec loop i acc =
     if i >= String.length str then acc
     else loop (i+1) (acc @ bits_of_byte (Char.code str.[i]))
