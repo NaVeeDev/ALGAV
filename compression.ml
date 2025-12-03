@@ -50,20 +50,16 @@ let compression input_file output_file =
 
         let get_next_char = utf8_decoder in_channel in 
 
-        let counter = ref 0 in
-
         let rec loop acc_table buffer =
-            if !counter >100 then (close_in in_channel; 
-                close_out out_channel) else
-                    (counter := !counter + 1;
+
         match get_next_char () with
             | Some s when Uchar.to_int s = 0xFEFF ->
+                loop acc_table buffer
+            | Some s when Uchar.to_int s = 0x0D ->
                 loop acc_table buffer
             | Some s ->
                 (* read a character from input file *)
                 (* getting the encodage of that character *)
-                Printf.printf "current utf8 : "; Printf.printf "'%s'" (uchar_to_string s); print_newline();
-                Printf.printf "U+%04X\n\n" (Uchar.to_int s);
                 let encodage = 
                     if mem (Char s) acc_table then (
                         (* 
@@ -97,8 +93,17 @@ let compression input_file output_file =
                 (* next UTF-8 to encode *)
                 loop acc_table buffer
             | None -> 
+                (* rempli le dernier octet avec le buffer restant, ou juste un octet vide *)
+                let fill_last_buffer_with_0 k_left buffer =
+                    buffer @ List.init k_left (fun _ -> 0)
+                in
+                let len = List.length buffer in
+                if (len > 0) then 
+                    (let last_buffer = fill_last_buffer_with_0 (8-(len mod 8)) buffer in
+                    ignore (write_in_output_file last_buffer))
+                ;
                 close_in in_channel; 
-                close_out out_channel;)
+                close_out out_channel;
         in
         loop table [];
     with  

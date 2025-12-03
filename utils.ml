@@ -65,3 +65,5 @@ let ecriture (input_file : string) (output_file : string) : unit =
       close_out ochannel;
     with Sys_error _ -> invalid_arg "File Not Found"
 ;;
+let compare_files (f1 : string) (f2 : string) : bool =
+  failwith "todo";

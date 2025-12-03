@@ -29,3 +29,11 @@ val lecture : string -> unit
     @raise Invalid_argument si aucun fichier dans le repertoire courant ne porte le nom de [input_file].
 *)
 val ecriture : string -> string -> unit
+
+(** [compare_files input_file output_file] compare si les deux fichiers donnés en paramètres sont similaires.
+
+    @param f1 le nom du premier fichier à comparer.
+    @param f2 le nom du deuxième fichier à comparer.
+    @raise Invalid_argument l'un des fichiers est introuvable
+*)
+val compare_files : string -> string -> bool

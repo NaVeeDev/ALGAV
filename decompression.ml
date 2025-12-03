@@ -21,22 +21,16 @@ let decompression input_file output_file =
             nth_bit i byte :: aux (i+1)
         in
         let res = aux 0 in
-        Printf.printf "---> get_next_byte -> "; List.iter (fun i -> Printf.printf "%d " i) res; print_newline();
         Some res
       with End_of_file -> None
     in
     (* *)
     let hashtag_is_next hashtag_code input_buffer =
-      Printf.printf "function hashtag_is_next ->\n";
-      Printf.printf "    code_de_hashtag : "; List.iter (fun i -> Printf.printf " %d" i) hashtag_code; print_newline();
-      Printf.printf "    input_buffer : "; List.iter (fun i -> Printf.printf " %d" i) input_buffer; print_newline();
       let rec aux hashtag_left buffer_left input_buffer =
         match hashtag_left with 
         | e :: ll -> (
-          Printf.printf "    Premier elem de hashtag à lire : %d\n" e;
           match buffer_left with 
           | b :: bb ->
-            Printf.printf "    Premier elem de buffer lu : %d\n" b;
             if b = e then 
               aux ll bb input_buffer
             else
@@ -44,12 +38,10 @@ let decompression input_file output_file =
           | [] -> 
             (
               (* not enough bits read in the input_buffer *)
-              Printf.printf "    Buffer vide, on le refill avec les 8 prochains bits\n";
               let next = get_next_byte () in 
               match next with 
               | Some new_buffer ->
                 (
-                  Printf.printf "    new_buffer_read : "; List.iter (fun i -> Printf.printf " %d" i) new_buffer; print_newline();
                   match new_buffer with 
                   | ee :: llll ->
                     (
@@ -64,14 +56,13 @@ let decompression input_file output_file =
             )
         )
         | [] -> (
-          Printf.printf "    code de hashtag reconnu \n"; (true, buffer_left)
+          (true, buffer_left)
         )
       in
       aux hashtag_code input_buffer input_buffer
     in
     (* *)
     let read_next_utf8 input_buffer =
-      Printf.printf "Reading the utf-8 char ->\n";
       let rec n_bytes buffer =
         if List.length buffer >= 5 then 
           match buffer with 
@@ -110,23 +101,18 @@ let decompression input_file output_file =
       in
       let rec aux buffer_left =
         let (nb_bytes, buffer_left) = n_bytes buffer_left in 
-        Printf.printf "    %d bytes needed to read\n" nb_bytes;
 
         let rec assemble_bytes k buffer_left acc =
           if k=0 then (acc, buffer_left)
           else 
             let (bits, buffer_left) = first_8_bits_from_bits buffer_left in 
-            Printf.printf "    byte read : "; List.iter (fun i -> Printf.printf "%d " i) bits; Printf.printf "| buffer_left : "; List.iter (fun i -> Printf.printf "%d " i) buffer_left; print_newline ();
             assemble_bytes (k-1) buffer_left (acc @ [(byte_of_bits bits)])
         in
 
         let (utf8_needed_bytes, buffer_left) = assemble_bytes nb_bytes buffer_left [] in 
-
-        Printf.printf "    All bytes together : "; List.iter (fun i -> Printf.printf "'%d' " i) utf8_needed_bytes; Printf.printf "| buffer_left : "; List.iter (fun i -> Printf.printf "%d " i) buffer_left; print_newline ();
         
         (* convertir en string pour Uutf *)
         let str = String.init nb_bytes (fun i -> Char.chr (List.nth utf8_needed_bytes i)) in
-        Printf.printf "    Char is : '%s'\n" str;
         let decoder = Uutf.decoder ~encoding:`UTF_8 (`String str) in
         match Uutf.decode decoder with
         | `Uchar uchar -> (uchar, buffer_left)
@@ -168,35 +154,18 @@ let decompression input_file output_file =
       Uutf.encode output_encoder (`Uchar uchar);
     in
 
-
-
-
-
-
-
-
-
-    let rec iterator = ref 0 in
-
-
     let rec loop acc_table input_buffer =
-      Printf.printf "\n\n* Itération : %d \n" !iterator; iterator := !iterator +1;
       let hashtag_code = code (EmptyChar) acc_table in 
       (* check if the next bits match the # code *)
-      Printf.printf "code de # : "; List.iter (fun i -> Printf.printf "%d " i) hashtag_code; print_newline ();
       let (is_next, input_buffer) = hashtag_is_next hashtag_code input_buffer in
       if (is_next) then
-        let () = Printf.printf "is a new symbol\n" in
         (* read next UTF-8 : new char *)
-        Printf.printf "Hashtag code : "; List.iter (fun i -> Printf.printf "%d " i) hashtag_code; print_newline ();
         let (uchar, buffer_left) = read_next_utf8 input_buffer in 
-        Printf.printf "buffer left : "; List.iter (fun i -> Printf.printf "%d " i) buffer_left; print_newline ();
         (* write character in output file *)
         ignore (write_in_output uchar);
         let acc_table = modification _H acc_table uchar in
         loop acc_table buffer_left
       else
-        let () = Printf.printf "is an old symbol\n" in
         (* read a code in the tree until we find a leaf *)
         let uchar_opt = find_next_code _H input_buffer in
         (* write character in output file *)
@@ -204,8 +173,6 @@ let decompression input_file output_file =
         | Some (uchar, buffer_left) -> 
           let uchar = (match uchar with Char u -> u | _ -> failwith "# cannot be written") in 
           (* uchar est ton Uchar.t *)
-          Printf.printf "old symbol decoded: U+%04X\n" (Uchar.to_int uchar);
-
           ignore (write_in_output uchar);  
           let acc_table = modification _H acc_table uchar in
           loop acc_table buffer_left
