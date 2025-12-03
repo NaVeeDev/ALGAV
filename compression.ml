@@ -5,19 +5,103 @@ let compression input_file output_file =
     let table = CharaMap.empty in
     let table = CharaMap.add EmptyChar _H table in
     try 
-    let in_channel = open_in input_file in
-    let out_channel = open_out output_file in
-        let rec loop acc_table =
-            try 
-                let s = input_char in_channel in
-                let new_code =  if mem (Char s) acc_table then 
-                    code (Char s) acc_table
-                    else 
-                            (code (EmptyChar) acc_table)@(initial_code s)
-                    in
-                List.iter (fun bit -> output_string out_channel (string_of_int bit)) new_code;
-                loop (modification _H acc_table s)
-            with End_of_file -> close_in in_channel; close_out out_channel;
+        let in_channel = open_in input_file in
+        let out_channel = open_out output_file in
+
+        let rec split_at_i i l =
+            if i <= 0 then 
+                ([], l)
+            else
+                match l with
+                | [] -> ([], [])
+                | e :: ll ->
+                    let left, right = split_at_i (i-1) ll in
+                    (e :: left, right)
         in
-        loop table;
-    with  Sys_error _ -> raise (Invalid_argument ("File not found: " ^ input_file ^ " or " ^ output_file))
+
+        let byte_counter = ref 3 in 
+
+        let rec write_in_output_file buffer =
+            if List.length buffer >= 8 then
+                let byte_bits, rest = split_at_i 8 buffer in
+                let byte_value = List.fold_left (fun acc b -> acc * 2 + b) 0 (byte_bits) in
+                output_byte out_channel byte_value;
+                byte_counter:= !byte_counter +1;
+                write_in_output_file rest
+            else buffer
+        in
+
+        output_byte out_channel 0xEF;
+        output_byte out_channel 0xBB;
+        output_byte out_channel 0xBF;
+
+        let bom = Uchar.of_int 0xFEFF in 
+        let table = insert table bom in
+
+        let utf8_decoder (ic : in_channel) =
+            let decoder = Uutf.decoder ~encoding:`UTF_8 (`Channel ic) in
+            fun () ->
+                match Uutf.decode decoder with
+                | `Uchar u -> Some u
+                | `End -> None
+                | `Malformed _ -> None
+                | _ -> None
+        in
+
+        let get_next_char = utf8_decoder in_channel in 
+
+        let counter = ref 0 in
+
+        let rec loop acc_table buffer =
+            if !counter >100 then (close_in in_channel; 
+                close_out out_channel) else
+                    (counter := !counter + 1;
+        match get_next_char () with
+            | Some s when Uchar.to_int s = 0xFEFF ->
+                loop acc_table buffer
+            | Some s ->
+                (* read a character from input file *)
+                (* getting the encodage of that character *)
+                Printf.printf "current utf8 : "; Printf.printf "'%s'" (uchar_to_string s); print_newline();
+                Printf.printf "U+%04X\n\n" (Uchar.to_int s);
+                let encodage = 
+                    if mem (Char s) acc_table then (
+                        (* 
+                            -> character already encoutered : 
+                           value is the character's code in the table
+                        *)
+                        let codage = code (Char s) acc_table in 
+                        codage
+                    ) else ( 
+                        (* 
+                            -> first time we see the character : 
+                           value is (code of EMPTY character in the table) ^ (UTF-8 code of the character)
+                        *)
+                        let code_EMPTY = code (EmptyChar) acc_table in 
+                        let code_UTF8 = initial_code s in 
+                        let code_complet = code_EMPTY @ code_UTF8 in 
+                        code_complet
+                        
+                    )
+                in
+                (* writing phase in output file *)
+                    (* add to buffer *)
+                    let buffer = buffer @ encodage in 
+                    
+                    (* if at least 8 bits, write byte in output file *)
+                    let buffer = write_in_output_file buffer in 
+
+                (* updating acc_table *)
+                let acc_table = modification _H acc_table s in
+
+                (* next UTF-8 to encode *)
+                loop acc_table buffer
+            | None -> 
+                close_in in_channel; 
+                close_out out_channel;)
+        in
+        loop table [];
+    with  
+        Sys_error _ -> 
+            raise (Invalid_argument ("File not found: " ^ input_file ^ " or " ^ output_file))
+;;

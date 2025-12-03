@@ -7,6 +7,13 @@
 *)
 val nth_bit : int -> int -> int
 
+(** [byte_of_bits bits] renvoie le [byte] correspondant à la suite de [bits].
+
+    @param bits la suite de bits.
+    @return la valeur du [byte] correspondant.
+*)
+val byte_of_bits : int list -> int 
+
 (** [lecture bin_file] affiche le contenu du fichier binaire de nom [bin_file].
 
     @param bin_file le nom du fichier binaire à lire.

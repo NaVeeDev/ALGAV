@@ -7,6 +7,16 @@ let nth_bit (n : int) (byte : int) : int =
     (byte lsr (7 - n)) land 1
 ;; 
 
+let byte_of_bits (bits : int list) : int =
+  let rec aux bits acc =
+    match bits with
+    | [] -> acc
+    | b :: ll -> aux ll (acc * 2 + b)
+  in
+  aux bits 0
+;;
+
+
 let lecture (bin_file : string) : unit =
   try
     let channel = Stdlib.open_in_bin bin_file in
