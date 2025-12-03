@@ -397,7 +397,7 @@ let initial_code (s : Uchar.t) : int list =
       if n < 0 then acc
       else aux (n-1) (Utils.nth_bit n byte :: acc)
     in
-    aux 7 []
+    loop n [] 0
   in
 
   let rec loop i acc =
