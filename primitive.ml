@@ -376,20 +376,23 @@ match _H.content with
   
 
 (*##### FONCTION POUR LE CODE INITIAL ####*)
+(** DISCLAIMER : fortement inspiré de ce qui est proposé sur 
+    l'exemple de l'utilisation de Camomile :
+    https://ocaml.org/cookbook/utf8-text-processing/camomile
+*)
+
+open Camomile
 let initial_code (s : char) : int list = 
-  let binary_of_int n  =
-    let rec loop n acc count = 
-      if n = 0 && count mod 8 = 0 then acc
-      else
-        let b = n land 1 in
-        loop (n lsr 1) (b :: acc) (count + 1)
+  let bits_of_byte b =
+    let rec aux i acc =
+      if i < 0 then acc
+      else aux (i - 1) ((b lsr i) land 1 :: acc)
     in
-    loop n [] 0
+    aux 7 []
   in
-  Printf.printf "Character: %c\n" s;
-  let uchar = Uchar.of_char s in
-  let int_char = Uchar.to_int uchar in
-  binary_of_int int_char;
-  
+  let uchar = UTF8.get (String.make 1 s) 0 in
+  let encoded = UTF8.init 1 (fun _ -> uchar) in
+  let bytes = List.init (String.length encoded) (fun i -> Char.code encoded.[i]) in
+  List.flatten (List.map bits_of_byte bytes)
 
 
