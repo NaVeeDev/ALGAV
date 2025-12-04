@@ -3,5 +3,6 @@
 
     @param input_file le nom du fichier à decompresser
     @param output_file le nom du fichier source dans lequel la decompression sera enregistrée
+    @param is_windows l'option qui dit si on encode en plus le caractère '\r' ou non avec les retours à la ligne '\n'
 *)
-val decompression : string -> string -> unit
+val decompression : string -> string -> bool -> unit

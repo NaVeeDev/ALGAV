@@ -1,7 +1,7 @@
 open Primitive
 open Utils
 
-let decompression input_file output_file =
+let decompression input_file output_file windows =
   let _H = {content = Leaf (EmptyChar, 0); parent = None} in
   let table = CharaMap.empty in
   let table = CharaMap.add EmptyChar _H table in
@@ -148,9 +148,13 @@ let decompression input_file output_file =
       in
       aux tree input_buffer
     in
-    (* *)
+    (* *) 
     let output_encoder = Uutf.encoder `UTF_8 (`Channel out_channel) in
     let write_in_output uchar =
+      if windows then begin
+        if Uchar.to_int uchar = 0x0A then 
+          ignore (Uutf.encode output_encoder (`Uchar (Uchar.of_int 0x0D)));
+      end;
       Uutf.encode output_encoder (`Uchar uchar);
     in
 
