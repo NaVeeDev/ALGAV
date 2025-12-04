@@ -7,6 +7,13 @@
 *)
 val nth_bit : int -> int -> int
 
+(** [byte_of_bits bits] renvoie le [byte] correspondant à la suite de [bits].
+
+    @param bits la suite de bits.
+    @return la valeur du [byte] correspondant.
+*)
+val byte_of_bits : int list -> int 
+
 (** [lecture bin_file] affiche le contenu du fichier binaire de nom [bin_file].
 
     @param bin_file le nom du fichier binaire à lire.
@@ -22,3 +29,11 @@ val lecture : string -> unit
     @raise Invalid_argument si aucun fichier dans le repertoire courant ne porte le nom de [input_file].
 *)
 val ecriture : string -> string -> unit
+
+(** [compare_files input_file output_file] compare si les deux fichiers donnés en paramètres sont similaires.
+
+    @param f1 le nom du premier fichier à comparer.
+    @param f2 le nom du deuxième fichier à comparer.
+    @raise Invalid_argument l'un des fichiers est introuvable
+*)
+val compare_files : string -> string -> bool

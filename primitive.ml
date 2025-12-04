@@ -8,7 +8,7 @@ let rec is_sorted (l : int list) : bool =
 
 (*##### STRUCTURE POUR LES ARBRES BINAIRES ####*)
 
-type chara = EmptyChar | Char of char
+type chara = EmptyChar | Char of Uchar.t
 type btree_ = Leaf of chara * int | Node of btree * int * btree
 and btree = {mutable content : btree_; mutable parent : btree option}
 
@@ -19,12 +19,17 @@ module CharaKey = struct
   | EmptyChar, EmptyChar -> 0 (* On pourrait aussi faire crasher comme il ne peut pas y en avoir 2*)
   | EmptyChar, Char _ -> -1
   | Char _, EmptyChar -> 1
-  | Char c1, Char c2 -> Char.compare c1 c2
+  | Char c1, Char c2 -> Uchar.compare c1 c2
 end
 
 module CharaMap = Map.Make(CharaKey)
 
 type btreeTable = btree CharaMap.t 
+
+let uchar_to_string (u : Uchar.t) : string =
+  let b = Buffer.create 4 in
+  Uutf.Buffer.add_utf_8 b u;
+  Buffer.contents b
 
 (*##### FONCTIONS POUR LES ARBRES BINAIRES ####*)
 let rec is_lte (t : btree) (v : int) : bool =
@@ -115,7 +120,7 @@ let print_btree (t : btree) : unit =
     match btree.content with 
     | Leaf (EmptyChar, i) -> "Leaf(#, " ^ (Int.to_string i) ^ ")"
     | Leaf (Char c, i) -> 
-      let res = "Leaf(" ^ (String.make 1 c) ^ ", " ^ (Int.to_string i) ^ ")" in res 
+      let res = "Leaf(" ^ (uchar_to_string c) ^ ", " ^ (Int.to_string i) ^ ")" in res 
     | Node (e1, i, e2) ->
       let s1 = to_string e1 in 
       let s2 = to_string e2 in 
@@ -123,7 +128,7 @@ let print_btree (t : btree) : unit =
   in 
   Printf.printf "%s\n" (to_string t)
 
-let insert (bTab : btreeTable) (c : char) : btreeTable = 
+let insert (bTab : btreeTable) (c : Uchar.t) : btreeTable = 
   match (CharaMap.find_opt (Char c) bTab) with 
   | None -> (*ajouter a la place de #*)
     let hashtag = CharaMap.find EmptyChar bTab in
@@ -162,33 +167,38 @@ let update_weights (t : btree) : unit =
     loop t
 
 let switch (table : btreeTable) (t1 : btree) (t2 : btree) : btreeTable =
-  let temp = t1.content in 
+  (* on échange les contenus *)
+  let temp = t1.content in
   t1.content <- t2.content;
   t2.content <- temp;
-  
-  (match t1.content, t2.content with 
-  | Leaf (c1, i1), Leaf (c2, i2) -> (
-    let table = CharaMap.add c1 t1 table in 
-    let table = CharaMap.add c2 t2 table in 
-    table
-  )
-  | Leaf (c1, i1), Node (e1, i2, e2) -> (
-    e1.parent <- Some t1;  
-    e2.parent <- Some t1;  
-    CharaMap.add c1 t1 table;
-  )
-  | Node (e1, i1, e2), Leaf (c2, i2) -> (
-    e1.parent <- Some t1;
-    e2.parent <- Some t1;
-    CharaMap.add c2 t2 table
-  )
-  | Node (e1, i1, e2), Node (ee1, i2, ee2) -> 
-    e1.parent <- Some t2;
-    e2.parent <- Some t2;
-    ee1.parent <- Some t1;  
-    ee2.parent <- Some t1;  
-    table)
 
+  let update_parents t =
+    match t.content with
+    | Node (l, _, r) ->
+        l.parent <- Some t;
+        r.parent <- Some t
+    | _ -> ()
+  in
+  update_parents t1;
+  update_parents t2;
+
+  let table =
+    match t1.content, t2.content with
+    | Leaf (c1, _), Leaf (c2, _) ->
+        let table = CharaMap.add c1 t1 table in
+        let table = CharaMap.add c2 t2 table in
+        table
+    | Leaf (c1, _), Node (e1, _, e2) ->
+        let table = CharaMap.add c1 t1 table in
+        table
+    | Node (e1, _, e2), Leaf (c2, _) ->
+        let table = CharaMap.add c2 t2 table in
+        table
+    | Node (_, _, _), Node (_, _, _) ->
+        table
+  in
+  table
+;;
 
 let finBloc (h : btree) (m : btree) : btree =
   let p = 
@@ -341,7 +351,7 @@ let rec traitement (_H : btree) (_Q : btree) (t : btreeTable) : btreeTable =
     (* ici on utilise b plutot que m car b et m ont été switch (mais pas leur nom local, seulement les contenus) *)
     traitement _H (parent b) t
 
-let modification (_H : btree) (_table : btreeTable) (s : char) : btreeTable =
+let modification (_H : btree) (_table : btreeTable) (s : Uchar.t) : btreeTable =
 match _H.content with 
 | Leaf (EmptyChar, _) -> 
   (* H == # *)
@@ -376,23 +386,23 @@ match _H.content with
   
 
 (*##### FONCTION POUR LE CODE INITIAL ####*)
-(** DISCLAIMER : fortement inspiré de ce qui est proposé sur 
-    l'exemple de l'utilisation de Camomile :
-    https://ocaml.org/cookbook/utf8-text-processing/camomile
-*)
 
-open Camomile
-let initial_code (s : char) : int list = 
-  let bits_of_byte b =
-    let rec aux i acc =
-      if i < 0 then acc
-      else aux (i - 1) ((b lsr i) land 1 :: acc)
+
+let initial_code (s : Uchar.t) : int list =
+  let buffer = Buffer.create 4 in
+  Uutf.Buffer.add_utf_8 buffer s;
+  let str = Buffer.contents buffer in
+
+  let bits_of_byte byte =
+    let rec aux n acc =
+      if n < 0 then acc
+      else aux (n-1) (Utils.nth_bit n byte :: acc)
     in
     aux 7 []
   in
-  let uchar = UTF8.get (String.make 1 s) 0 in
-  let encoded = UTF8.init 1 (fun _ -> uchar) in
-  let bytes = List.init (String.length encoded) (fun i -> Char.code encoded.[i]) in
-  List.flatten (List.map bits_of_byte bytes)
-
-
+  let rec loop i acc =
+    if i >= String.length str then acc
+    else loop (i+1) (acc @ bits_of_byte (Char.code str.[i]))
+  in
+  loop 0 []
+;;

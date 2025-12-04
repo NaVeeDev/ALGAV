@@ -14,7 +14,7 @@ val is_sorted : int list -> bool
 (** [btree] est la structure pour représenter un arbre binaire.
     Seules les feuilles contiennent un char.
 *)
-type chara = EmptyChar | Char of char
+type chara = EmptyChar | Char of Uchar.t
 type btree_ = Leaf of chara * int | Node of btree * int * btree
 and btree = {mutable content : btree_; mutable parent : btree option}
 
@@ -27,6 +27,11 @@ end
 module CharaMap : Map.S with type key = CharaKey.t
 type btreeTable = btree CharaMap.t
 
+(** [uchar_to_string u] renvoie [u] sous forme de string
+    
+    @param u le Uchar que l'on veut traduire.
+    @return [u] en type String *)
+val uchar_to_string : Uchar.t -> string
 
 (** [equal_btree t1 t2] vérifie si [t1] et [t2] sont les même btree
     
@@ -94,7 +99,7 @@ val is_adding_up : btree -> bool
     @param c la clé du nouveau noeud.
     @return la table mise à jour.
 *)
-val insert : btreeTable -> char -> btreeTable
+val insert : btreeTable -> Uchar.t -> btreeTable
 
 (** [print_btree t] affiche l'arbre [t] de manière lisible.
 
@@ -161,7 +166,7 @@ val is_incrementable : btree -> btree list -> bool * btree option
     @param s le caractère à insérer.
     @return la table mise à jour.
 *)
-val modification : btree -> btreeTable -> char -> btreeTable
+val modification : btree -> btreeTable -> Uchar.t -> btreeTable
 
 (** [traitement _H _Q _table] traite les nœuds [_H] et [_Q] dans la table [_table].
 
@@ -187,4 +192,4 @@ val code : chara -> btreeTable -> int list
     @param s le caractère à traduire
     @return la liste correspondant au code de [s]
 *)
-val initial_code : char -> int list
+val initial_code : Uchar.t -> int list

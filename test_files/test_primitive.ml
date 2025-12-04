@@ -142,7 +142,7 @@ let test_is_gte_ () =
                (create_node
                   (create_node (create_leaf EmptyChar 128) 68 (create_leaf EmptyChar 201))
                   200
-                  (create_leaf (Char 'c') 100)
+                  (create_leaf (Char (Uchar.of_char 'c')) 100)
                )
             )
          )
@@ -157,15 +157,15 @@ let test_is_gte_ () =
 ;;
 
 let test_update_weights_ () =
-   let l1 = create_leaf (Char 'a') 1 in 
-   let l2 = create_leaf (Char 'b') 2 in 
-   let l3 = create_leaf (Char 'c') 3 in 
-   let l4 = create_leaf (Char 'd') 4 in 
+   let l1 = create_leaf (Char (Uchar.of_char 'a')) 1 in 
+   let l2 = create_leaf (Char (Uchar.of_char 'b')) 2 in 
+   let l3 = create_leaf (Char (Uchar.of_char 'c')) 3 in 
+   let l4 = create_leaf (Char (Uchar.of_char 'd')) 4 in 
 
-   let l5 = create_leaf (Char 'e') 5 in 
-   let l6 = create_leaf (Char 'f') 6 in 
-   let l7 = create_leaf (Char 'g') 7 in 
-   let l8 = create_leaf (Char 'h') 8 in
+   let l5 = create_leaf (Char (Uchar.of_char 'e')) 5 in 
+   let l6 = create_leaf (Char (Uchar.of_char 'f')) 6 in 
+   let l7 = create_leaf (Char (Uchar.of_char 'g')) 7 in 
+   let l8 = create_leaf (Char (Uchar.of_char 'h')) 8 in
    
    let n4 = create_node l1 (-5) l2 in 
    let n5 = create_node l3 (-5) l4 in 
@@ -230,29 +230,29 @@ let test_switch_ () =
    let table = CharaMap.empty in 
    let table = CharaMap.add EmptyChar tree table in
 
-   let table = modification tree table 'c' in
-   let table = modification tree table 'a' in 
-   let table = modification tree table 'r' in
-   let table = modification tree table 'a' in 
-   let table = modification tree table 'm' in 
-   let table = modification tree table 'b' in 
-   let table = modification tree table 'a' in 
-   let table = modification tree table 'r' in 
-   let table = modification tree table 'b' in 
-   let table = modification tree table 'c' in 
-   let table = modification tree table 't' in 
-   let _ = switch table (parent (CharaMap.find (Char 'r') table)) (parent (CharaMap.find (Char 'm') table)) in
+   let table = modification tree table (Uchar.of_char 'c') in
+   let table = modification tree table (Uchar.of_char 'a') in 
+   let table = modification tree table (Uchar.of_char 'r') in
+   let table = modification tree table (Uchar.of_char 'a') in 
+   let table = modification tree table (Uchar.of_char 'm') in 
+   let table = modification tree table (Uchar.of_char 'b') in 
+   let table = modification tree table (Uchar.of_char 'a') in 
+   let table = modification tree table (Uchar.of_char 'r') in 
+   let table = modification tree table (Uchar.of_char 'b') in 
+   let table = modification tree table (Uchar.of_char 'c') in 
+   let table = modification tree table (Uchar.of_char 't') in 
+   let _ = switch table (parent (CharaMap.find (Char (Uchar.of_char 'r')) table)) (parent (CharaMap.find (Char (Uchar.of_char 'm')) table)) in
    Printf.printf "Supposed to be : Node(Node(Node(Leaf(#, 0), 1, Leaf(t, 1)), 2, Leaf(m, 1)), 11, Node(Leaf(a, 3), 7, Node(Node(Leaf(b, 2), 4, Leaf(r, 2)), 4, Leaf(c, 2))))"; print_newline ();
    Printf.printf "Actual         : "; print_btree tree; print_newline ();
 ;;
 
 let test_finBloc_ () =
-  let leaf = create_leaf (Char 'x') 10 in
+  let leaf = create_leaf (Char (Uchar.of_char 'x')) 10 in
   let result = finBloc leaf leaf in
   assert (result == leaf);
 
   let left = create_leaf EmptyChar 3 in
-  let right = create_leaf (Char 'c') 3 in
+  let right = create_leaf (Char (Uchar.of_char 'c')) 3 in
   let root = create_node left 6 right in
 
   let result = finBloc root left in
@@ -266,12 +266,12 @@ let test_finBloc_ () =
      / \     /   \
    (5) (5) (c,3) (d,2)
   *)
-  let l1 = create_leaf (Char 'a') 5 in
-  let l2 = create_leaf (Char 'b') 5 in
+  let l1 = create_leaf (Char (Uchar.of_char 'a')) 5 in
+  let l2 = create_leaf (Char (Uchar.of_char 'b')) 5 in
   let left_big = create_node l1 10 l2 in
 
-  let l3 = create_leaf (Char 'c') 3 in
-  let l4 = create_leaf (Char 'd') 2 in
+  let l3 = create_leaf (Char (Uchar.of_char 'c')) 3 in
+  let l4 = create_leaf (Char (Uchar.of_char 'd')) 2 in
   let right_big = create_node l3 5 l4 in
 
   let root_big = create_node left_big 10 right_big in
@@ -291,14 +291,14 @@ let test_finBloc_ () =
     (7)   (8) (0)  (0)  (6)  (9) (0)  (15)
    *)
 
-  let l1 = create_leaf (Char 'a') 7 in
-  let l2 = create_leaf (Char 'b') 8 in
-  let l3 = create_leaf (Char 'c') 0 in
-  let l4 = create_leaf (Char 'd') 0 in
-  let l5 = create_leaf (Char 'e') 6 in
-  let l6 = create_leaf (Char 'f') 9 in
-  let l7 = create_leaf (Char 'g') 0 in
-  let l8 = create_leaf (Char 'h') 15 in
+  let l1 = create_leaf (Char (Uchar.of_char 'a')) 7 in
+  let l2 = create_leaf (Char (Uchar.of_char 'b')) 8 in
+  let l3 = create_leaf (Char (Uchar.of_char 'c')) 0 in
+  let l4 = create_leaf (Char (Uchar.of_char 'd')) 0 in
+  let l5 = create_leaf (Char (Uchar.of_char 'e')) 6 in
+  let l6 = create_leaf (Char (Uchar.of_char 'f')) 9 in
+  let l7 = create_leaf (Char (Uchar.of_char 'g')) 0 in
+  let l8 = create_leaf (Char (Uchar.of_char 'h')) 15 in
 
   let n3 = create_node l1 15 l2 in
   let n4 = create_node l3 0 l4 in
@@ -344,10 +344,10 @@ let test_insert_ () =
    let table = CharaMap.empty in 
    let table = CharaMap.add EmptyChar tree table in
    
-   let table = insert table 'a' in 
-   assert (mem (Char 'a') table);
+   let table = insert table (Uchar.of_char 'a') in 
+   assert (mem (Char (Uchar.of_char 'a')) table);
    
-   let o = CharaMap.find_opt (Char 'a') table in 
+   let o = CharaMap.find_opt (Char (Uchar.of_char 'a')) table in 
    (match o with 
    | None -> assert false;
    | Some btree -> 
@@ -355,7 +355,7 @@ let test_insert_ () =
          (match btree.content with 
                    | Leaf (chara, i) -> (match chara with 
                                    | EmptyChar -> assert false; 
-                                   | Char c -> assert (c = 'a')
+                                   | Char c -> assert (c = (Uchar.of_char 'a'))
                                    );
                                    assert (i=1)
                    | _ -> assert false;
@@ -373,22 +373,22 @@ let test_insert_ () =
                          (match e2.content with
                          | Leaf (chara, i) -> (match chara with 
                                          | EmptyChar -> assert false; 
-                                         | Char c -> assert (c = 'a')
+                                         | Char c -> assert (c = (Uchar.of_char 'a'))
                                          );
                                          assert (i=1)
                          | _ -> assert false;
                          );
    );
    
-   let table = insert table 'a' in 
-   assert (mem (Char 'a') table);
-   let o = CharaMap.find_opt (Char 'a') table in 
+   let table = insert table (Uchar.of_char 'a') in 
+   assert (mem (Char (Uchar.of_char 'a')) table);
+   let o = CharaMap.find_opt (Char (Uchar.of_char 'a')) table in 
    (match o with 
    | None -> assert false;
    | Some btree -> (match btree.content with 
                    | Leaf (chara, i) -> (match chara with 
                                    | EmptyChar -> assert false; 
-                                   | Char c -> assert (c = 'a')
+                                   | Char c -> assert (c = (Uchar.of_char 'a'))
                                    );
                                    assert (i=2)
                    | _ -> assert false;
@@ -406,34 +406,34 @@ let test_insert_ () =
                          (match e2.content with
                          | Leaf (chara, i) -> (match chara with 
                                          | EmptyChar -> assert false; 
-                                         | Char c -> assert (c = 'a')
+                                         | Char c -> assert (c = (Uchar.of_char 'a'))
                                          );
                                          assert (i=2)
                          | _ -> assert false;
                          );
    );
 
-   let table = insert table 'b' in 
-   assert (mem (Char 'a') table);
-   assert (mem (Char 'b') table);
-   let o = CharaMap.find_opt (Char 'a') table in 
+   let table = insert table (Uchar.of_char 'b') in 
+   assert (mem (Char (Uchar.of_char 'a')) table);
+   assert (mem (Char (Uchar.of_char 'b')) table);
+   let o = CharaMap.find_opt (Char (Uchar.of_char 'a')) table in 
    (match o with 
    | None -> assert false;
    | Some btree -> (match btree.content with 
                    | Leaf (chara, i) -> (match chara with 
                                    | EmptyChar -> assert false; 
-                                   | Char c -> assert (c = 'a')
+                                   | Char c -> assert (c = (Uchar.of_char 'a'))
                                    );
                                    assert (i=2)
                    | _ -> assert false;
    ));
-   let o = CharaMap.find_opt (Char 'b') table in 
+   let o = CharaMap.find_opt (Char (Uchar.of_char 'b')) table in 
    (match o with 
    | None -> assert false;
    | Some btree -> (match btree.content with 
                    | Leaf (chara, i) -> (match chara with 
                                    | EmptyChar -> assert false; 
-                                   | Char c -> assert (c = 'b')
+                                   | Char c -> assert (c = (Uchar.of_char 'b'))
                                    );
                                    assert (i=1)
                    | _ -> assert false;
@@ -443,7 +443,7 @@ let test_insert_ () =
    | Node (e1, _, e2) -> (match e2.content with
                          | Leaf (chara, i) -> (match chara with 
                                          | EmptyChar -> assert false; 
-                                         | Char c -> assert (c = 'a');
+                                         | Char c -> assert (c = (Uchar.of_char 'a'));
                                          );
                                          assert (i=2)
                          | _ -> assert false;
@@ -462,7 +462,7 @@ let test_insert_ () =
                            (match e2.content with
                            | Leaf (chara, i) -> (match chara with 
                                           | EmptyChar -> assert false; 
-                                          | Char c -> assert (c = 'b')
+                                          | Char c -> assert (c = (Uchar.of_char 'b'))
                                           );
                                           assert (i=1)
                            | _ -> assert false;
@@ -470,27 +470,27 @@ let test_insert_ () =
                          );
    );
 
-   let table = insert table 'b' in 
-   assert (mem (Char 'a') table);
-   assert (mem (Char 'b') table);
-   let o = CharaMap.find_opt (Char 'a') table in 
+   let table = insert table (Uchar.of_char 'b') in 
+   assert (mem (Char (Uchar.of_char 'a')) table);
+   assert (mem (Char (Uchar.of_char 'b')) table);
+   let o = CharaMap.find_opt (Char (Uchar.of_char 'a')) table in 
    (match o with 
    | None -> assert false;
    | Some btree -> (match btree.content with 
                    | Leaf (chara, i) -> (match chara with 
                                    | EmptyChar -> assert false; 
-                                   | Char c -> assert (c = 'a')
+                                   | Char c -> assert (c = (Uchar.of_char 'a'))
                                    );
                                    assert (i=2)
                    | _ -> assert false;
    ));
-   let o = CharaMap.find_opt (Char 'b') table in 
+   let o = CharaMap.find_opt (Char (Uchar.of_char 'b')) table in 
    (match o with 
    | None -> assert false;
    | Some btree -> (match btree.content with 
                    | Leaf (chara, i) -> (match chara with 
                                    | EmptyChar -> assert false; 
-                                   | Char c -> assert (c = 'b')
+                                   | Char c -> assert (c = (Uchar.of_char 'b'))
                                    );
                                    assert (i=2)
                    | _ -> assert false;
@@ -500,7 +500,7 @@ let test_insert_ () =
    | Node (e1, _, e2) -> (match e2.content with
                          | Leaf (chara, i) -> (match chara with 
                                          | EmptyChar -> assert false; 
-                                         | Char c -> assert (c = 'a');
+                                         | Char c -> assert (c = (Uchar.of_char 'a'));
                                          );
                                          assert (i=2)
                          | _ -> assert false;
@@ -519,7 +519,7 @@ let test_insert_ () =
                            (match e2.content with
                            | Leaf (chara, i) -> (match chara with 
                                           | EmptyChar -> assert false; 
-                                          | Char c -> assert (c = 'b')
+                                          | Char c -> assert (c = (Uchar.of_char 'b'))
                                           );
                                           assert (i=2);
                            | _ -> assert false;
@@ -536,75 +536,75 @@ let test_is_adding_up_ () =
    let table = CharaMap.add EmptyChar tree table in
 
    for i = 0 to 2 do
-      let _ = insert table 'a' in 
+      let _ = insert table (Uchar.of_char 'a') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'a' in 
+      let _ = insert table (Uchar.of_char 'a') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'b' in 
+      let _ = insert table (Uchar.of_char 'b') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'b' in 
+      let _ = insert table (Uchar.of_char 'b') in 
       update_weights tree;
       assert (is_adding_up tree);
       
-      let _ = insert table 'a' in 
+      let _ = insert table (Uchar.of_char 'a') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'c' in 
+      let _ = insert table (Uchar.of_char 'c') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'd' in 
+      let _ = insert table (Uchar.of_char 'd') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'd' in 
+      let _ = insert table (Uchar.of_char 'd') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'a' in 
+      let _ = insert table (Uchar.of_char 'a') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'e' in 
+      let _ = insert table (Uchar.of_char 'e') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'f' in 
+      let _ = insert table (Uchar.of_char 'f') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'e' in 
+      let _ = insert table (Uchar.of_char 'e') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'g' in 
+      let _ = insert table (Uchar.of_char 'g') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'h' in 
+      let _ = insert table (Uchar.of_char 'h') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'o' in 
+      let _ = insert table (Uchar.of_char 'o') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'd' in 
+      let _ = insert table (Uchar.of_char 'd') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'c' in 
+      let _ = insert table (Uchar.of_char 'c') in 
       update_weights tree;
       assert (is_adding_up tree);
 
-      let _ = insert table 'd' in 
+      let _ = insert table (Uchar.of_char 'd') in 
       update_weights tree;
       assert (is_adding_up tree);
    done;
@@ -622,14 +622,14 @@ let test_is_gdbh_ () =
     (32) (32) (32)  (32) (32) (32)(32) (32)
    *)
 
-  let l1 = create_leaf (Char 'a') 32 in
-  let l2 = create_leaf (Char 'b') 32 in
-  let l3 = create_leaf (Char 'c') 32 in
-  let l4 = create_leaf (Char 'd') 32 in
-  let l5 = create_leaf (Char 'e') 32 in
-  let l6 = create_leaf (Char 'f') 32 in
-  let l7 = create_leaf (Char 'g') 32 in
-  let l8 = create_leaf (Char 'h') 32 in
+  let l1 = create_leaf (Char (Uchar.of_char 'a')) 32 in
+  let l2 = create_leaf (Char (Uchar.of_char 'b')) 32 in
+  let l3 = create_leaf (Char (Uchar.of_char 'c')) 32 in
+  let l4 = create_leaf (Char (Uchar.of_char 'd')) 32 in
+  let l5 = create_leaf (Char (Uchar.of_char 'e')) 32 in
+  let l6 = create_leaf (Char (Uchar.of_char 'f')) 32 in
+  let l7 = create_leaf (Char (Uchar.of_char 'g')) 32 in
+  let l8 = create_leaf (Char (Uchar.of_char 'h')) 32 in
 
   let n3 = create_node l1 64 l2 in
   let n4 = create_node l3 64 l4 in
@@ -654,14 +654,14 @@ let test_is_gdbh_ () =
     (7)   (8) (0)  (0)  (6)  (9) (0)  (15)
    *)
 
-  let l1 = create_leaf (Char 'a') 7 in
-  let l2 = create_leaf (Char 'b') 8 in
-  let l3 = create_leaf (Char 'c') 0 in
-  let l4 = create_leaf (Char 'd') 0 in
-  let l5 = create_leaf (Char 'e') 6 in
-  let l6 = create_leaf (Char 'f') 9 in
-  let l7 = create_leaf (Char 'g') 0 in
-  let l8 = create_leaf (Char 'h') 15 in
+  let l1 = create_leaf (Char (Uchar.of_char 'a')) 7 in
+  let l2 = create_leaf (Char (Uchar.of_char 'b')) 8 in
+  let l3 = create_leaf (Char (Uchar.of_char 'c')) 0 in
+  let l4 = create_leaf (Char (Uchar.of_char 'd')) 0 in
+  let l5 = create_leaf (Char (Uchar.of_char 'e')) 6 in
+  let l6 = create_leaf (Char (Uchar.of_char 'f')) 9 in
+  let l7 = create_leaf (Char (Uchar.of_char 'g')) 0 in
+  let l8 = create_leaf (Char (Uchar.of_char 'h')) 15 in
 
   let n3 = create_node l1 15 l2 in
   let n4 = create_node l3 0 l4 in
@@ -685,14 +685,14 @@ let test_is_gdbh_ () =
     (1)   (2) (3)  (4)  (5)  (6) (7)  (8)
    *)
 
-  let l1 = create_leaf (Char 'a') 1 in
-  let l2 = create_leaf (Char 'b') 2 in
-  let l3 = create_leaf (Char 'c') 3 in
-  let l4 = create_leaf (Char 'd') 4 in
-  let l5 = create_leaf (Char 'e') 5 in
-  let l6 = create_leaf (Char 'f') 6 in
-  let l7 = create_leaf (Char 'g') 7 in
-  let l8 = create_leaf (Char 'h') 8 in
+  let l1 = create_leaf (Char (Uchar.of_char 'a')) 1 in
+  let l2 = create_leaf (Char (Uchar.of_char 'b')) 2 in
+  let l3 = create_leaf (Char (Uchar.of_char 'c')) 3 in
+  let l4 = create_leaf (Char (Uchar.of_char 'd')) 4 in
+  let l5 = create_leaf (Char (Uchar.of_char 'e')) 5 in
+  let l6 = create_leaf (Char (Uchar.of_char 'f')) 6 in
+  let l7 = create_leaf (Char (Uchar.of_char 'g')) 7 in
+  let l8 = create_leaf (Char (Uchar.of_char 'h')) 8 in
 
   let n3 = create_node l1 3 l2 in
   let n4 = create_node l3 7 l4 in
@@ -716,14 +716,14 @@ let test_is_gdbh_ () =
     (1)   (2) (3)  (4)  (5)  (6) (7)  (8)
    *)
 
-  let l1 = create_leaf (Char 'a') 1 in
-  let l2 = create_leaf (Char 'b') 2 in
-  let l3 = create_leaf (Char 'c') 3 in
-  let l4 = create_leaf (Char 'd') 4 in
-  let l5 = create_leaf (Char 'e') 5 in
-  let l6 = create_leaf (Char 'f') 6 in
-  let l7 = create_leaf (Char 'g') 7 in
-  let l8 = create_leaf (Char 'h') 8 in
+  let l1 = create_leaf (Char (Uchar.of_char 'a')) 1 in
+  let l2 = create_leaf (Char (Uchar.of_char 'b')) 2 in
+  let l3 = create_leaf (Char (Uchar.of_char 'c')) 3 in
+  let l4 = create_leaf (Char (Uchar.of_char 'd')) 4 in
+  let l5 = create_leaf (Char (Uchar.of_char 'e')) 5 in
+  let l6 = create_leaf (Char (Uchar.of_char 'f')) 6 in
+  let l7 = create_leaf (Char (Uchar.of_char 'g')) 7 in
+  let l8 = create_leaf (Char (Uchar.of_char 'h')) 8 in
 
   let n3 = create_node l1 3 l2 in
   let n4 = create_node l3 7 l4 in
@@ -747,14 +747,14 @@ let test_is_gdbh_ () =
     (64)  (64) (64) (64) (128)(128)(128)(128)
    *)
 
-  let l1 = create_leaf (Char 'a') 64 in
-  let l2 = create_leaf (Char 'b') 64 in
-  let l3 = create_leaf (Char 'c') 64 in
-  let l4 = create_leaf (Char 'd') 64 in
-  let l5 = create_leaf (Char 'e') 128 in
-  let l6 = create_leaf (Char 'f') 128 in
-  let l7 = create_leaf (Char 'g') 128 in
-  let l8 = create_leaf (Char 'h') 128 in
+  let l1 = create_leaf (Char (Uchar.of_char 'a')) 64 in
+  let l2 = create_leaf (Char (Uchar.of_char 'b')) 64 in
+  let l3 = create_leaf (Char (Uchar.of_char 'c')) 64 in
+  let l4 = create_leaf (Char (Uchar.of_char 'd')) 64 in
+  let l5 = create_leaf (Char (Uchar.of_char 'e')) 128 in
+  let l6 = create_leaf (Char (Uchar.of_char 'f')) 128 in
+  let l7 = create_leaf (Char (Uchar.of_char 'g')) 128 in
+  let l8 = create_leaf (Char (Uchar.of_char 'h')) 128 in
 
   let n3 = create_node l1 128 l2 in
   let n4 = create_node l3 128 l4 in
@@ -776,19 +776,19 @@ let test_btree_equality_ () =
 
    assert (tree.content = (CharaMap.find EmptyChar table).content);
 
-   let table = insert table 'a' in 
-   let table = insert table 'a' in 
-   let table = insert table 'b' in 
-   let table = insert table 'b' in 
-   let table = insert table 'c' in 
-   let table = insert table 'd' in 
-   let table = insert table 'd' in 
-   let table = insert table 'd' in 
-   let table = insert table 'a' in 
-   let table = insert table 'e' in 
-   let table = insert table 'f' in 
-   let table = insert table 'e' in 
-   let table = insert table 'g' in 
+   let table = insert table (Uchar.of_char 'a') in 
+   let table = insert table (Uchar.of_char 'a') in 
+   let table = insert table (Uchar.of_char 'b') in 
+   let table = insert table (Uchar.of_char 'b') in 
+   let table = insert table (Uchar.of_char 'c') in 
+   let table = insert table (Uchar.of_char 'd') in 
+   let table = insert table (Uchar.of_char 'd') in 
+   let table = insert table (Uchar.of_char 'd') in 
+   let table = insert table (Uchar.of_char 'a') in 
+   let table = insert table (Uchar.of_char 'e') in 
+   let table = insert table (Uchar.of_char 'f') in 
+   let table = insert table (Uchar.of_char 'e') in 
+   let table = insert table (Uchar.of_char 'g') in 
 
    let rec equal b1 b2 =
       match b1.content, b2.content with 
@@ -843,14 +843,14 @@ let test_parent_ () =
     (64)  (64) (64) (64) (128)(128)(128)(128)
    *)
 
-  let l1 = create_leaf (Char 'a') 64 in
-  let l2 = create_leaf (Char 'b') 64 in
-  let l3 = create_leaf (Char 'c') 64 in
-  let l4 = create_leaf (Char 'd') 64 in
-  let l5 = create_leaf (Char 'e') 128 in
-  let l6 = create_leaf (Char 'f') 128 in
-  let l7 = create_leaf (Char 'g') 128 in
-  let l8 = create_leaf (Char 'h') 128 in
+  let l1 = create_leaf (Char (Uchar.of_char 'a')) 64 in
+  let l2 = create_leaf (Char (Uchar.of_char 'b')) 64 in
+  let l3 = create_leaf (Char (Uchar.of_char 'c')) 64 in
+  let l4 = create_leaf (Char (Uchar.of_char 'd')) 64 in
+  let l5 = create_leaf (Char (Uchar.of_char 'e')) 128 in
+  let l6 = create_leaf (Char (Uchar.of_char 'f')) 128 in
+  let l7 = create_leaf (Char (Uchar.of_char 'g')) 128 in
+  let l8 = create_leaf (Char (Uchar.of_char 'h')) 128 in
 
   let n3 = create_node l1 128 l2 in
   let n4 = create_node l3 128 l4 in
@@ -909,14 +909,14 @@ let test_is_incrementable_ () =
     (64)  (64) (64) (64) (128)(128)(128)(128)
    *)
 
-  let l1 = create_leaf (Char 'a') 64 in
-  let l2 = create_leaf (Char 'b') 64 in
-  let l3 = create_leaf (Char 'c') 64 in
-  let l4 = create_leaf (Char 'd') 64 in
-  let l5 = create_leaf (Char 'e') 128 in
-  let l6 = create_leaf (Char 'f') 128 in
-  let l7 = create_leaf (Char 'g') 128 in
-  let l8 = create_leaf (Char 'h') 128 in
+  let l1 = create_leaf (Char (Uchar.of_char 'a')) 64 in
+  let l2 = create_leaf (Char (Uchar.of_char 'b')) 64 in
+  let l3 = create_leaf (Char (Uchar.of_char 'c')) 64 in
+  let l4 = create_leaf (Char (Uchar.of_char 'd')) 64 in
+  let l5 = create_leaf (Char (Uchar.of_char 'e')) 128 in
+  let l6 = create_leaf (Char (Uchar.of_char 'f')) 128 in
+  let l7 = create_leaf (Char (Uchar.of_char 'g')) 128 in
+  let l8 = create_leaf (Char (Uchar.of_char 'h')) 128 in
 
   let n3 = create_node l1 128 l2 in
   let n4 = create_node l3 128 l4 in
@@ -946,17 +946,17 @@ let test_modification_ () =
    let table = CharaMap.empty in 
    let table = CharaMap.add EmptyChar tree table in
 
-   let table = modification tree table 'c' in Printf.printf "c : "; print_btree tree; 
-   let table = modification tree table 'a' in Printf.printf "ca : "; print_btree tree;
-   let table = modification tree table 'r' in Printf.printf "car : "; print_btree tree;
-   let table = modification tree table 'a' in Printf.printf "cara : "; print_btree tree;
-   let table = modification tree table 'm' in Printf.printf "caram : "; print_btree tree;
-   let table = modification tree table 'b' in Printf.printf "caramb : "; print_btree tree;
-   let table = modification tree table 'a' in Printf.printf "caramba : "; print_btree tree;
-   let table = modification tree table 'r' in Printf.printf "carambar : "; print_btree tree;
-   let table = modification tree table 'b' in Printf.printf "carambarb : "; print_btree tree;
-   let table = modification tree table 'c' in Printf.printf "carambarbc : "; print_btree tree;
-   let _ = modification tree table 'm' in Printf.printf "\ncarambarbcm    : "; print_btree tree;
+   let table = modification tree table (Uchar.of_char 'c') in (*Printf.printf "c : "; print_btree tree; *)
+   let table = modification tree table (Uchar.of_char 'a') in (*Printf.printf "ca : "; print_btree tree; *)
+   let table = modification tree table (Uchar.of_char 'r') in (*Printf.printf "car : "; print_btree tree; *)
+   let table = modification tree table (Uchar.of_char 'a') in (*Printf.printf "cara : "; print_btree tree; *)
+   let table = modification tree table (Uchar.of_char 'm') in (*Printf.printf "caram : "; print_btree tree; *)
+   let table = modification tree table (Uchar.of_char 'b') in (*Printf.printf "caramb : "; print_btree tree; *)
+   let table = modification tree table (Uchar.of_char 'a') in (*Printf.printf "caramba : "; print_btree tree; *)
+   let table = modification tree table (Uchar.of_char 'r') in (*Printf.printf "carambar : "; print_btree tree; *)
+   let table = modification tree table (Uchar.of_char 'b') in (*Printf.printf "carambarb : "; print_btree tree; *)
+   let table = modification tree table (Uchar.of_char 'c') in (*Printf.printf "carambarbc : "; print_btree tree; *)
+   let _ = modification tree table (Uchar.of_char 'm') in Printf.printf "\ncarambarbcm    : "; print_btree tree;
    Printf.printf "Supposed to be : Node(Node(Leaf(b, 2), 4, Leaf(r, 2)), 11, Node(Leaf(a, 3), 7, Node(Node(Leaf(#, 0), 2, Leaf(m, 2)), 4, Leaf(c, 2))))\n\n"
 ;;
 
@@ -965,23 +965,23 @@ let test_code_ () =
    let table = CharaMap.empty in 
    let table = CharaMap.add EmptyChar tree table in
 
-   let table = modification tree table 'c' in 
-   let table = modification tree table 'a' in 
-   let table = modification tree table 'r' in 
-   let table = modification tree table 'a' in 
-   let table = modification tree table 'm' in 
-   let table = modification tree table 'b' in 
-   let table = modification tree table 'a' in 
-   let table = modification tree table 'r' in 
-   let table = modification tree table 'b' in 
-   let table = modification tree table 'c' in 
-   let table = modification tree table 'm' in 
+   let table = modification tree table (Uchar.of_char 'c') in 
+   let table = modification tree table (Uchar.of_char 'a') in 
+   let table = modification tree table (Uchar.of_char 'r') in 
+   let table = modification tree table (Uchar.of_char 'a') in 
+   let table = modification tree table (Uchar.of_char 'm') in 
+   let table = modification tree table (Uchar.of_char 'b') in 
+   let table = modification tree table (Uchar.of_char 'a') in 
+   let table = modification tree table (Uchar.of_char 'r') in 
+   let table = modification tree table (Uchar.of_char 'b') in 
+   let table = modification tree table (Uchar.of_char 'c') in 
+   let table = modification tree table (Uchar.of_char 'm') in 
    
-   assert ((code (Char 'm') table) = [1; 1; 0; 1]);
-   assert ((code (Char 'b') table) = [0; 0]);
-   assert ((code (Char 'r') table) = [0; 1]);
-   assert ((code (Char 'a') table) = [1; 0]);
-   assert ((code (Char 'c') table) = [1; 1; 1]);
+   assert ((code (Char (Uchar.of_char 'm')) table) = [1; 1; 0; 1]);
+   assert ((code (Char (Uchar.of_char 'b')) table) = [0; 0]);
+   assert ((code (Char (Uchar.of_char 'r')) table) = [0; 1]);
+   assert ((code (Char (Uchar.of_char 'a')) table) = [1; 0]);
+   assert ((code (Char (Uchar.of_char 'c')) table) = [1; 1; 1]);
    ()
 
 (* Appeler cette fonction pour executer les tests *)
