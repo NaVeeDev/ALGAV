@@ -151,8 +151,8 @@ let decompression input_file output_file windows =
     (* *) 
     let output_encoder = Uutf.encoder `UTF_8 (`Channel out_channel) in
     let write_in_output uchar =
-      if windows then begin
-        if Uchar.to_int uchar = 0x0A then 
+      if Uchar.to_int uchar = 0x0A then begin
+        if windows then 
           ignore (Uutf.encode output_encoder (`Uchar (Uchar.of_int 0x0D)));
       end;
       Uutf.encode output_encoder (`Uchar uchar);
