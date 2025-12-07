@@ -148,9 +148,12 @@ let decompression input_file output_file visual =
       in
       aux tree input_buffer
     in
-    (* *)
+    (* *) 
     let output_encoder = Uutf.encoder `UTF_8 (`Channel out_channel) in
     let write_in_output uchar =
+      if Uchar.to_int uchar = 0x0A then begin
+        ignore (Uutf.encode output_encoder (`Uchar (Uchar.of_int 0x0D)));
+      end;
       Uutf.encode output_encoder (`Uchar uchar);
     in
 
