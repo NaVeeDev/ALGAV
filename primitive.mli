@@ -130,6 +130,13 @@ val update_weights : btree -> unit
 *)
 val switch : btreeTable -> btree -> btree -> btreeTable
 
+(** [btree_to_dot h filename] génère un fichier DOT représentant l'arbre binaire [h].
+
+    @param h l'arbre binaire à représenter.
+    @param filename le nom du fichier DOT à générer.
+*)
+val btree_to_dot : btree -> string -> unit
+
 (** [finBloc h m] étant donné un nœud [m] numéroté xm dans un AHA [h], renvoie le nœud [b] tel que W (xm) = W (xm+1), ... = W (xb) et W (xb) < W (xb+1).
 
     @param h l'arbre principal.

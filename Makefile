@@ -1,5 +1,5 @@
 # Nom de l'exécutable principal
-MAIN_EXEC = main
+MAIN_EXEC = decompression compression
 # Nom de l'exécutable de tests
 TEST_EXEC = tests
 
@@ -46,8 +46,8 @@ $(TEST_DIR)/test_decompression.cmx: decompression.cmx
 $(TEST_DIR)/test.cmx: utils.cmx $(TEST_DIR)/test_utils.cmx $(TEST_DIR)/test_primitive.cmx $(TEST_DIR)/test_compression.cmx $(TEST_DIR)/test_decompression.cmx
 
 # Exécutable principal
-$(MAIN_EXEC): utils.cmi utils.cmx main.cmx
-	$(OCAMLOPT) $(OCAMLOPTFLAGS) utils.cmx main.cmx -o $@
+$(MAIN_EXEC): utils.cmi utils.cmx primitive.cmi primitive.cmx compression.cmi compression.cmx decompression.cmi decompression.cmx 
+	$(OCAMLOPT) $(OCAMLOPTFLAGS) utils.cmx primitive.cmx unix.cmxa compression.cmx decompression.cmx -o $@
 
 # Exécutable des tests
 $(TEST_EXEC): $(CMI) utils.cmx primitive.cmx compression.cmx decompression.cmx $(TEST_DIR)/test_utils.cmx $(TEST_DIR)/test_primitive.cmx $(TEST_DIR)/test_compression.cmx $(TEST_DIR)/test_decompression.cmx $(TEST_DIR)/test.cmx
@@ -59,4 +59,4 @@ test: $(TEST_EXEC)
 
 # Nettoyer les fichiers compilés
 clean:
-	rm -f *.cmx *.o *.cmi $(MAIN_EXEC) $(TEST_EXEC) $(TEST_DIR)/*.cmx $(TEST_DIR)/*.cmi $(TEST_DIR)/*.o
+	rm -f *.cmx *.o *.cmi $(MAIN_EXEC) $(TEST_EXEC) $(TEST_DIR)/*.cmx $(TEST_DIR)/*.cmi $(TEST_DIR)/*.o *.dot

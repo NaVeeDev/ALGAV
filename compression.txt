@@ -1,0 +1,1 @@
+test_files/ressources/Blaise_Pascal/Blaise_Pascal.txt;test_files/ressources/Blaise_Pascal/test_compression_blaise_pascal.txt.huff;120304;66246;0.55066;1549.566

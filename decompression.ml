@@ -1,7 +1,7 @@
 open Primitive
 open Utils
 
-let decompression input_file output_file =
+let decompression input_file output_file visual =
   let _H = {content = Leaf (EmptyChar, 0); parent = None} in
   let table = CharaMap.empty in
   let table = CharaMap.add EmptyChar _H table in
@@ -181,7 +181,10 @@ let decompression input_file output_file =
           (* Plus rien à lire *)
           (ignore (Uutf.encode output_encoder `End);
           close_in in_channel; 
-          close_out out_channel;)
+          close_out out_channel;
+          if visual then 
+                    (btree_to_dot _H ("decompression_tree.dot");
+                    Printf.printf "Decompression tree saved as decompression_tree.dot\n";))
     in
       (* skip BOM *) ignore (get_next_byte ()); ignore (get_next_byte ()); ignore (get_next_byte ());
       let bom = Uchar.of_int 0xFEFF in 
@@ -194,3 +197,12 @@ let decompression input_file output_file =
   with 
     Sys_error _ -> 
             raise (Invalid_argument ("File not found: " ^ input_file ^ " or " ^ output_file))
+    ;;
+
+let () = 
+    if Filename.basename Sys.argv.(0) = "decompression" then
+    let args = Sys.argv in
+    let input_file = args.(1) in
+    let output_file = args.(2) in
+    let visual = String.equal args.(3) "true" in
+    decompression input_file output_file visual;

@@ -1,6 +1,8 @@
 open Primitive
+open Unix
 
-let compression input_file output_file =
+let compression input_file output_file visual =
+    let start_time = Unix.gettimeofday () in
     let _H = {content = Leaf (EmptyChar, 0); parent = None} in
     let table = CharaMap.empty in
     let table = CharaMap.add EmptyChar _H table in
@@ -19,14 +21,15 @@ let compression input_file output_file =
                     (e :: left, right)
         in
 
-        let byte_counter = ref 3 in 
+        let input_byte_counter = in_channel_length in_channel in
+        let output_byte_counter = ref 3 in 
 
         let rec write_in_output_file buffer =
             if List.length buffer >= 8 then
                 let byte_bits, rest = split_at_i 8 buffer in
                 let byte_value = List.fold_left (fun acc b -> acc * 2 + b) 0 (byte_bits) in
                 output_byte out_channel byte_value;
-                byte_counter:= !byte_counter +1;
+                output_byte_counter := !output_byte_counter +1;
                 write_in_output_file rest
             else buffer
         in
@@ -104,9 +107,27 @@ let compression input_file output_file =
                 ;
                 close_in in_channel; 
                 close_out out_channel;
+                let end_time = Unix.gettimeofday () in
+                let timer = (end_time -. start_time) *. 1000.0 in
+                (if visual then 
+                    (btree_to_dot _H ("compression_tree.dot");
+                    Printf.printf "Compression tree saved as compression_tree.dot\n"));
+                let info_channel = open_out_gen [Open_wronly; Open_creat; Open_append] 0o644 "compression.txt" in
+                output_string info_channel (Printf.sprintf "%s;%s;%d;%d;%.5f;%.3f\n" input_file output_file input_byte_counter !output_byte_counter 
+                (float_of_int !output_byte_counter /. float_of_int input_byte_counter) timer);
+                close_out info_channel;
         in
         loop table [];
     with  
         Sys_error _ -> 
             raise (Invalid_argument ("File not found: " ^ input_file ^ " or " ^ output_file))
 ;;
+
+let () = 
+    if Filename.basename Sys.argv.(0) = "compression" then
+    let args = Sys.argv in
+    let input_file = args.(1) in
+    let output_file = args.(2) in
+    let visual = String.equal args.(3) "true" in
+    compression input_file output_file visual;
+        

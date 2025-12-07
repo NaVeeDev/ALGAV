@@ -4,4 +4,4 @@
     @param input_file le nom du fichier à decompresser
     @param output_file le nom du fichier source dans lequel la decompression sera enregistrée
 *)
-val decompression : string -> string -> unit
+val decompression : string -> string -> bool -> unit

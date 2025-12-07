@@ -200,6 +200,29 @@ let switch (table : btreeTable) (t1 : btree) (t2 : btree) : btreeTable =
   table
 ;;
 
+let btree_to_dot (h : btree) (filename : string) : unit =
+  let oc = open_out filename in
+  let rec write_node oc node =
+    match node.content with
+    | Leaf (c, w) ->
+        let label = match c with
+          | EmptyChar -> "#"
+          | Char u -> uchar_to_string u
+        in
+        Printf.fprintf oc "  \"%d\" [label=\"%s, %d\", shape=ellipse, style=filled,fillcolor=lightgreen];\n" (Hashtbl.hash node) label w
+    | Node (left, w, right) ->
+        Printf.fprintf oc "  \"%d\" [label=\"%d\", shape=plaintext];\n" (Hashtbl.hash node) w;
+        write_node oc left;
+        write_node oc right;
+        Printf.fprintf oc "  \"%d\" -> \"%d\" [label=\"0\"];\n" (Hashtbl.hash node) (Hashtbl.hash left);
+        Printf.fprintf oc "  \"%d\" -> \"%d\" [label=\"1\"];\n" (Hashtbl.hash node) (Hashtbl.hash right);
+  in
+  Printf.fprintf oc "digraph G {\n";
+  write_node oc h;
+  Printf.fprintf oc "}\n";
+  close_out oc;;
+
+
 let finBloc (h : btree) (m : btree) : btree =
   let p = 
     match m.content with 

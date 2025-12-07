@@ -4,7 +4,7 @@ open Compression
 let blaise_pascal_ () =
   let input = "test_files/ressources/Blaise_Pascal/Blaise_Pascal.txt.huff" in 
   let output = "test_files/ressources/Blaise_Pascal/test_decompression_blaise_pascal.txt" in
-  decompression input output;
+  decompression input output true;
   
   (* compression "test_files/ressources/Blaise_Pascal/Blaise_Pascal.txt" "test_files/ressources/Blaise_Pascal/inter.huff";
   decompression "test_files/ressources/Blaise_Pascal/inter.huff" "test_files/ressources/Blaise_Pascal/res.txt"; *)

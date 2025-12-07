@@ -982,6 +982,7 @@ let test_code_ () =
    assert ((code (Char (Uchar.of_char 'r')) table) = [0; 1]);
    assert ((code (Char (Uchar.of_char 'a')) table) = [1; 0]);
    assert ((code (Char (Uchar.of_char 'c')) table) = [1; 1; 1]);
+   btree_to_dot tree "test_code.dot";
    ()
 
 (* Appeler cette fonction pour executer les tests *)

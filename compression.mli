@@ -4,4 +4,4 @@
     @param input_file le nom du fichier à compresser
     @param output_file le nom du fichier source dans lequel la compression sera enregistrée
 *)
-val compression : string -> string -> unit
+val compression : string -> string -> bool -> unit

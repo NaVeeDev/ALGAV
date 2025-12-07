@@ -3,7 +3,7 @@ open Compression
 let blaise_pascal_ () =
   let input = "test_files/ressources/Blaise_Pascal/Blaise_Pascal.txt" in 
   let output = "test_files/ressources/Blaise_Pascal/test_compression_blaise_pascal.txt.huff" in
-  compression input output;
+  compression input output true;
 ;;
 
 let test_compression_ () =
