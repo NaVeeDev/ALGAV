@@ -3,7 +3,7 @@ open Decompression
 
 let analyse () =
   let base_directory = "test_files/ressources/Language/" in
-  let files_to_use = [base_directory^"text1"; base_directory^"text2"; base_directory^"text3"; base_directory^"text4"] in 
+  let files_to_use = [base_directory^"fibo.py"; base_directory^"database.json"] in 
   
   let rec loop l k =
     match l with 

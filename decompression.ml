@@ -13,6 +13,7 @@ let decompression input_file output_file visual =
     let in_channel = open_in input_file in
     let out_channel = open_out output_file in
     let input_byte_counter = in_channel_length in_channel in
+    let output_byte_counter = ref 0 in
     (* *)
     let get_next_byte () = 
       try
@@ -155,8 +156,10 @@ let decompression input_file output_file visual =
     let output_encoder = Uutf.encoder `UTF_8 (`Channel out_channel) in
     let write_in_output uchar =
       if Uchar.to_int uchar = 0x0A then begin
-        ignore (Uutf.encode output_encoder (`Uchar (Uchar.of_int 0x0D)));
+        output_byte_counter := !output_byte_counter +1;
+        ignore (Uutf.encode output_encoder (`Uchar (Uchar.of_int 0x0D))); (* on rajoute \r pour match nos fichiers de départ (windows) *)
       end;
+      output_byte_counter := !output_byte_counter +1;
       Uutf.encode output_encoder (`Uchar uchar);
     in
 
@@ -187,7 +190,7 @@ let decompression input_file output_file visual =
           (* Plus rien à lire *)
           (ignore (Uutf.encode output_encoder `End);
           let end_time = Unix.gettimeofday () in
-          let output_byte_counter = out_channel_length out_channel in
+          let output_byte_counter = !output_byte_counter in 
           close_in in_channel; 
           close_out out_channel;
           let timer = (end_time -. start_time) *. 1000.0 in

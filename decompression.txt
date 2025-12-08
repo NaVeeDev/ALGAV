@@ -1,5 +1,9 @@
-test_files/ressources/Gutemberg/compression_livre0.huff;test_files/ressources/Gutemberg/decompression_livre0.txt;57396;65536;1.14182;540.884
-test_files/ressources/Gutemberg/compression_livre1.huff;test_files/ressources/Gutemberg/decompression_livre1.txt;265735;458752;1.72635;2508.919
-test_files/ressources/Gutemberg/compression_livre2.huff;test_files/ressources/Gutemberg/decompression_livre2.txt;309076;524288;1.69631;2925.378
-test_files/ressources/Gutemberg/compression_livre3.huff;test_files/ressources/Gutemberg/decompression_livre3.txt;199365;327680;1.64362;1873.886
-test_files/ressources/Gutemberg/compression_livre4.huff;test_files/ressources/Gutemberg/decompression_livre4.txt;154460;262144;1.69716;1368.433
+test_files/ressources/Gutemberg/compression_livre0.huff;test_files/ressources/Gutemberg/decompression_livre0.txt;57396;98719;1.71996;761.062
+test_files/ressources/Gutemberg/compression_livre1.huff;test_files/ressources/Gutemberg/decompression_livre1.txt;265735;471923;1.77592;3536.326
+test_files/ressources/Gutemberg/compression_livre2.huff;test_files/ressources/Gutemberg/decompression_livre2.txt;154460;272894;1.76676;2025.252
+test_files/ressources/Random/compression_random0.huff;test_files/ressources/Random/decompression_random0.txt;3107;4052;1.30415;26.716
+test_files/ressources/Random/compression_random1.huff;test_files/ressources/Random/decompression_random1.txt;3151;4108;1.30371;33.324
+test_files/ressources/Random/compression_random2.huff;test_files/ressources/Random/decompression_random2.txt;226645;303897;1.34085;1564.365
+test_files/ressources/Random/compression_random3.huff;test_files/ressources/Random/decompression_random3.txt;9272;12319;1.32862;77.496
+test_files/ressources/Language/compression_language0.huff;test_files/ressources/Language/decompression_language0.txt;78;105;1.34615;0.378
+test_files/ressources/Language/compression_language1.huff;test_files/ressources/Language/decompression_language1.txt;25033;44994;1.79739;404.192

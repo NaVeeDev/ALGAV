@@ -1,5 +1,9 @@
-test_files/ressources/Gutemberg/Curiosités judiciaires et historiques du moyen âge. Procès contre les animaux.txt;test_files/ressources/Gutemberg/compression_livre0.huff;101060;57396;0.56794;552.663
-test_files/ressources/Gutemberg/Dernières lettres d'un bon jeune homme à sa cousine Madeleine.txt;test_files/ressources/Gutemberg/compression_livre1.huff;483163;265735;0.54999;2684.186
-test_files/ressources/Gutemberg/Histoire des salons de Paris (Tome 3 sur 6).txt;test_files/ressources/Gutemberg/compression_livre2.huff;556859;309076;0.55503;2878.995
-test_files/ressources/Gutemberg/La Mère de la Marquise.txt;test_files/ressources/Gutemberg/compression_livre3.huff;347058;199365;0.57444;1835.309
-test_files/ressources/Gutemberg/Pierre de Villerglé.txt;test_files/ressources/Gutemberg/compression_livre4.huff;279829;154460;0.55198;1346.671
+test_files/ressources/Gutemberg/Curiosités judiciaires et historiques du moyen âge. Procès contre les animaux.txt;test_files/ressources/Gutemberg/compression_livre0.huff;101060;57396;0.56794;739.496
+test_files/ressources/Gutemberg/Dernières lettres d'un bon jeune homme à sa cousine Madeleine.txt;test_files/ressources/Gutemberg/compression_livre1.huff;483163;265735;0.54999;3512.870
+test_files/ressources/Gutemberg/Pierre de Villerglé.txt;test_files/ressources/Gutemberg/compression_livre2.huff;279829;154460;0.55198;1965.177
+test_files/ressources/Random/randomText1.txt;test_files/ressources/Random/compression_random0.huff;4003;3107;0.77617;24.293
+test_files/ressources/Random/randomText2.txt;test_files/ressources/Random/compression_random1.huff;4056;3151;0.77687;31.925
+test_files/ressources/Random/randomText3.txt;test_files/ressources/Random/compression_random2.huff;300003;226645;0.75548;1638.158
+test_files/ressources/Random/randomText4.txt;test_files/ressources/Random/compression_random3.huff;12162;9272;0.76237;67.286
+test_files/ressources/Language/fibo.py;test_files/ressources/Language/compression_language0.huff;98;78;0.79592;0.478
+test_files/ressources/Language/database.json;test_files/ressources/Language/compression_language1.huff;43713;25033;0.57267;424.382

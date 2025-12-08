@@ -5,8 +5,6 @@ let analyse () =
   let base_directory = "test_files/ressources/Gutemberg/" in
   let files_to_use = [base_directory^"Curiosités judiciaires et historiques du moyen âge. Procès contre les animaux.txt";
                       base_directory^"Dernières lettres d'un bon jeune homme à sa cousine Madeleine.txt";
-                      base_directory^"Histoire des salons de Paris (Tome 3 sur 6).txt"; 
-                      base_directory^"La Mère de la Marquise.txt";
                       base_directory^"Pierre de Villerglé.txt"]
   in 
   
