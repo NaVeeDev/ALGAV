@@ -1,13 +1,38 @@
 open Compression 
 open Decompression
 
+
+let rec generate_texts files =
+  let get_random_utf8 () =
+    (* renvoie une liste d'entiers (max 4) qui encodent un utf-8 *)
+    failwith "todo"
+  in
+
+  match files with
+  | [] -> ()
+  | (file_name, nb_octets) :: ll -> ( 
+      let out_channel = open_out file_name in
+      (* ajout de BOM *)
+      output_byte out_channel 0xEF;
+      output_byte out_channel 0xBB;
+      output_byte out_channel 0xBF;
+      (* génération *)
+      for i = 0 to nb_octets do 
+        let utf8_list = get_random_utf8 () in 
+        List.iter (fun byte -> output_byte out_channel byte) utf8_list  
+      done;
+  )
+;;
+
 let analyse () =
   let base_directory = "test_files/ressources/Random/" in
-  let files_to_use = [base_directory^"text1"; base_directory^"text2"; base_directory^"text3"; base_directory^"text4"] in
+  let files_to_use = [(base_directory^"randomText1.txt", 700000); (base_directory^"randomText2.txt", 400000)] in
+
+  generate_texts files_to_use;
 
   let rec loop l k =
     match l with 
-    | input :: ll -> 
+    | (input, _) :: ll -> 
       let compressed_file_name = (base_directory^"compression_random"^(string_of_int k)^".huff") in 
       compression input compressed_file_name false;
       decompression compressed_file_name (base_directory^"decompression_random"^string_of_int k^".txt") false;

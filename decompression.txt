@@ -1,1 +1,5 @@
-test_files/ressources/Blaise_Pascal/Blaise_Pascal.txt.huff;test_files/ressources/Blaise_Pascal/test_decompression_blaise_pascal.txt;66246;65536;0.98928;922.206
+test_files/ressources/Gutemberg/compression_livre0.huff;test_files/ressources/Gutemberg/decompression_livre0.txt;57396;65536;1.14182;540.884
+test_files/ressources/Gutemberg/compression_livre1.huff;test_files/ressources/Gutemberg/decompression_livre1.txt;265735;458752;1.72635;2508.919
+test_files/ressources/Gutemberg/compression_livre2.huff;test_files/ressources/Gutemberg/decompression_livre2.txt;309076;524288;1.69631;2925.378
+test_files/ressources/Gutemberg/compression_livre3.huff;test_files/ressources/Gutemberg/decompression_livre3.txt;199365;327680;1.64362;1873.886
+test_files/ressources/Gutemberg/compression_livre4.huff;test_files/ressources/Gutemberg/decompression_livre4.txt;154460;262144;1.69716;1368.433

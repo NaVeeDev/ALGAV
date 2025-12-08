@@ -1,6 +1,5 @@
-test_files/ressources/Gutemberg/Curiosités judiciaires et historiques du moyen âge. Procès contre les animaux.txt;compression_livre0.huff;101060;57396;0.56794;758.945
-test_files/ressources/Gutemberg/Dernières lettres d'un bon jeune homme à sa cousine Madeleine.txt;compression_livre1.huff;483163;265735;0.54999;3489.623
-test_files/ressources/Gutemberg/Histoire des salons de Paris (Tome 3 sur 6).txt;compression_livre2.huff;556859;309076;0.55503;4209.188
-test_files/ressources/Gutemberg/La Mère de la Marquise.txt;compression_livre3.huff;347058;199365;0.57444;2730.885
-test_files/ressources/Gutemberg/Pierre de Villerglé.txt;compression_livre4.huff;279829;154460;0.55198;1934.321
-test_files/ressources/Blaise_Pascal/Blaise_Pascal.txt;test_files/ressources/Blaise_Pascal/test_compression_blaise_pascal.txt.huff;120304;66246;0.55066;1019.315
+test_files/ressources/Gutemberg/Curiosités judiciaires et historiques du moyen âge. Procès contre les animaux.txt;test_files/ressources/Gutemberg/compression_livre0.huff;101060;57396;0.56794;552.663
+test_files/ressources/Gutemberg/Dernières lettres d'un bon jeune homme à sa cousine Madeleine.txt;test_files/ressources/Gutemberg/compression_livre1.huff;483163;265735;0.54999;2684.186
+test_files/ressources/Gutemberg/Histoire des salons de Paris (Tome 3 sur 6).txt;test_files/ressources/Gutemberg/compression_livre2.huff;556859;309076;0.55503;2878.995
+test_files/ressources/Gutemberg/La Mère de la Marquise.txt;test_files/ressources/Gutemberg/compression_livre3.huff;347058;199365;0.57444;1835.309
+test_files/ressources/Gutemberg/Pierre de Villerglé.txt;test_files/ressources/Gutemberg/compression_livre4.huff;279829;154460;0.55198;1346.671
