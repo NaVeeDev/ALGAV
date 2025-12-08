@@ -205,7 +205,7 @@ let decompression input_file output_file visual =
     in
       (* skip BOM *) ignore (get_next_byte ()); ignore (get_next_byte ()); ignore (get_next_byte ());
       let bom = Uchar.of_int 0xFEFF in 
-      let table = insert table bom in
+      let table = modification _H table bom in
       ignore (write_in_output bom);
       loop table [];
     )

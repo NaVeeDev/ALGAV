@@ -1,6 +1,4 @@
-let analyse_ () =
-  Printf.printf "LALA\n";
-  
+let analyse_ () =  
   (* reset des stats *)
   let channel = open_out_gen [Open_trunc] 0o644 "compression.txt" in
   close_out channel;
