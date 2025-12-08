@@ -1,7 +1,9 @@
 open Primitive
 open Utils
+open Unix
 
 let decompression input_file output_file visual =
+  let start_time = Unix.gettimeofday () in
   let _H = {content = Leaf (EmptyChar, 0); parent = None} in
   let table = CharaMap.empty in
   let table = CharaMap.add EmptyChar _H table in
@@ -10,6 +12,7 @@ let decompression input_file output_file visual =
     (
     let in_channel = open_in input_file in
     let out_channel = open_out output_file in
+    let input_byte_counter = in_channel_length in_channel in
     (* *)
     let get_next_byte () = 
       try
@@ -183,11 +186,19 @@ let decompression input_file output_file visual =
         | None -> 
           (* Plus rien à lire *)
           (ignore (Uutf.encode output_encoder `End);
+          let end_time = Unix.gettimeofday () in
+          let output_byte_counter = out_channel_length out_channel in
           close_in in_channel; 
           close_out out_channel;
+          let timer = (end_time -. start_time) *. 1000.0 in
           if visual then 
                     (btree_to_dot _H ("decompression_tree.dot");
-                    Printf.printf "Decompression tree saved as decompression_tree.dot\n";))
+                    Printf.printf "Decompression tree saved as decompression_tree.dot\n";);
+          let info_channel = open_out_gen [Open_wronly; Open_creat; Open_append] 0o644 "decompression.txt" in
+          output_string info_channel (Printf.sprintf "%s;%s;%d;%d;%.5f;%.3f\n" input_file output_file input_byte_counter output_byte_counter 
+          (float_of_int output_byte_counter /. float_of_int input_byte_counter) timer);
+          close_out info_channel;
+          )
     in
       (* skip BOM *) ignore (get_next_byte ()); ignore (get_next_byte ()); ignore (get_next_byte ());
       let bom = Uchar.of_int 0xFEFF in 

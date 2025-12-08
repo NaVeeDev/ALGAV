@@ -3,3 +3,4 @@ test_files/ressources/Gutemberg/Dernières lettres d'un bon jeune homme à sa co
 test_files/ressources/Gutemberg/Histoire des salons de Paris (Tome 3 sur 6).txt;compression_livre2.huff;556859;309076;0.55503;4209.188
 test_files/ressources/Gutemberg/La Mère de la Marquise.txt;compression_livre3.huff;347058;199365;0.57444;2730.885
 test_files/ressources/Gutemberg/Pierre de Villerglé.txt;compression_livre4.huff;279829;154460;0.55198;1934.321
+test_files/ressources/Blaise_Pascal/Blaise_Pascal.txt;test_files/ressources/Blaise_Pascal/test_compression_blaise_pascal.txt.huff;120304;66246;0.55066;1019.315

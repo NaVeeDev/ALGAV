@@ -1,0 +1,1 @@
+test_files/ressources/Blaise_Pascal/Blaise_Pascal.txt.huff;test_files/ressources/Blaise_Pascal/test_decompression_blaise_pascal.txt;66246;65536;0.98928;922.206
