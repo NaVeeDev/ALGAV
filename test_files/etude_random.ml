@@ -3,10 +3,10 @@ open Decompression
 
 let analyse () =
   let base_directory = "test_files/ressources/Random/" in
-  let files_to_use = [(base_directory^"randomText1.txt");(base_directory^"randomText2.txt");(base_directory^"randomText3.txt");(base_directory^"randomText4.txt")] in
+  let files_to_use = [(base_directory^"randomText1.txt");(base_directory^"randomText2.txt");(base_directory^"all_a.txt");(base_directory^"randomText3.txt");(base_directory^"worst_case.txt")] in
 
   (* génération d'un fichier sur le terminal avec : head -c 3000 /dev/urandom | base64 | head -c sizeX > random_text_sizeX.txt
-      Puis traduction en UTF-8 depuis internet *)
+      Puis traduction en UTF-8 *)
 
   let rec loop l k =
     match l with 
