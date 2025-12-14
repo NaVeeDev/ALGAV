@@ -1,10 +1,10 @@
-test_files/ressources/Gutemberg/Curiosités judiciaires et historiques du moyen âge. Procès contre les animaux.txt;test_files/ressources/Gutemberg/compression_livre0.huff;101060;57396;0.56794;532.130
-test_files/ressources/Gutemberg/Dernières lettres d'un bon jeune homme à sa cousine Madeleine.txt;test_files/ressources/Gutemberg/compression_livre1.huff;483163;265735;0.54999;2532.900
-test_files/ressources/Gutemberg/Pierre de Villerglé.txt;test_files/ressources/Gutemberg/compression_livre2.huff;279829;154460;0.55198;1244.760
-test_files/ressources/Random/randomText1.txt;test_files/ressources/Random/compression_random0.huff;4003;3107;0.77617;18.172
-test_files/ressources/Random/randomText2.txt;test_files/ressources/Random/compression_random1.huff;12162;9272;0.76237;51.573
-test_files/ressources/Random/all_a.txt;test_files/ressources/Random/compression_random2.huff;19998;2504;0.12521;3.527
-test_files/ressources/Random/randomText3.txt;test_files/ressources/Random/compression_random3.huff;300003;226645;0.75548;1136.636
-test_files/ressources/Random/worst_case.txt;test_files/ressources/Random/compression_random4.huff;262;390;1.48855;1.154
-test_files/ressources/Language/fibo.py;test_files/ressources/Language/compression_language0.huff;98;78;0.79592;0.376
-test_files/ressources/Language/database.json;test_files/ressources/Language/compression_language1.huff;43713;25033;0.57267;288.497
+test_files/ressources/Gutemberg/Curiosités judiciaires et historiques du moyen âge. Procès contre les animaux.txt;test_files/ressources/Gutemberg/compression_livre0.huff;101060;59111;0.58491;653.534
+test_files/ressources/Gutemberg/Dernières lettres d'un bon jeune homme à sa cousine Madeleine.txt;test_files/ressources/Gutemberg/compression_livre1.huff;483163;273478;0.56602;3297.690
+test_files/ressources/Gutemberg/Pierre de Villerglé.txt;test_files/ressources/Gutemberg/compression_livre2.huff;279829;159469;0.56988;1819.110
+test_files/ressources/Random/randomText1.txt;test_files/ressources/Random/compression_random0.huff;4003;3107;0.77617;26.248
+test_files/ressources/Random/randomText2.txt;test_files/ressources/Random/compression_random1.huff;12162;9272;0.76237;73.142
+test_files/ressources/Random/all_a.txt;test_files/ressources/Random/compression_random2.huff;19998;2504;0.12521;6.676
+test_files/ressources/Random/randomText3.txt;test_files/ressources/Random/compression_random3.huff;300003;226645;0.75548;1563.376
+test_files/ressources/Random/worst_case.txt;test_files/ressources/Random/compression_random4.huff;262;390;1.48855;2.656
+test_files/ressources/Language/fibo.py;test_files/ressources/Language/compression_language0.huff;98;78;0.79592;0.778
+test_files/ressources/Language/database.json;test_files/ressources/Language/compression_language1.huff;43713;25033;0.57267;394.771

@@ -58,8 +58,8 @@ let compression input_file output_file visual =
         match get_next_char () with
             | Some s when Uchar.to_int s = 0xFEFF -> (* BOM *)
                 loop acc_table buffer
-            | Some s when Uchar.to_int s = 0x0D -> (* /r *)
-                loop acc_table buffer
+            (* | Some s when Uchar.to_int s = 0x0D -> (* /r *)
+                loop acc_table buffer *)
             | Some s ->
                 (* read a character from input file *)
                 (* getting the encodage of that character *)

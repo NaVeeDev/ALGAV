@@ -54,7 +54,7 @@ let max_t (t : btree) : int =
  let vals_per_depth (t : btree) : int list list =
   let rec loop curr acc =
     match curr with
-    | [] -> List.rev acc
+    | [] -> acc
     | _ ->
       let vals, next =
         List.fold_right (fun node (vals_acc, next_acc) ->
@@ -98,7 +98,7 @@ let is_gdbh (t : btree) : bool =
                  in
                  is_gd && is_bh && loop (Some (List.hd (List.rev x))) ll
   in
-  loop None (List.rev lvl)
+  loop None lvl
 
 let is_adding_up (t : btree) : bool =
   let rec loop t =

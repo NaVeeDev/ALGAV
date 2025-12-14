@@ -155,10 +155,10 @@ let decompression input_file output_file visual =
     (* *) 
     let output_encoder = Uutf.encoder `UTF_8 (`Channel out_channel) in
     let write_in_output uchar =
-      if Uchar.to_int uchar = 0x0A then begin
+      (*if Uchar.to_int uchar = 0x0A then begin
         output_byte_counter := !output_byte_counter +1;
         ignore (Uutf.encode output_encoder (`Uchar (Uchar.of_int 0x0D))); (* on rajoute \r pour match nos fichiers de départ (windows) *)
-      end;
+      end;*)
       output_byte_counter := !output_byte_counter +1;
       Uutf.encode output_encoder (`Uchar uchar);
     in
