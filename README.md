@@ -5,7 +5,7 @@ Le sujet du projet est disponible dans cette archive sous le nom de `sujet.pdf`.
 Plus de détails sont disponibles dans `rapport.pdf`.
 
 ## Etudiants
-Yvan Parent - 21500313 - M1 STL - Yvan.Parent@etu.sorbonne-universite.fr - yvan.prt \
+Yvan Parent - 21500313 - M1 STL - Yvan.Parent@etu.sorbonne-universite.fr - yvanprt \
 Laura Ly - 21500152 - M1 STL - Laura.Ly@etu.sorbonne-universite.fr - NaVeeDev
 
 ## Langage de programmation utilisé
