@@ -19,18 +19,28 @@ ocamlopt
 5.3.0
 
 ## Instruction de compilation
-Pour compiler les tests (primitives inclues) et les lancer:
-```make test```
+Pour compiler les tests (primitives inclues) et les lancer: \
+```
+make test
+```
 
-Pour lancer une analyse statistique sur l'efficacité de nos algorithmes:
-```make analyse```
+Pour lancer une analyse statistique sur l'efficacité de nos algorithmes: \
+```
+make analyse
+```
 
-Pour compresser individuellement un fichier `file.txt` en un fichier `file.huff`:
-```./compresser.sh file.txt file.huff```
+Pour compresser individuellement un fichier `file.txt` en un fichier `file.huff`: \
+```
+./compresser.sh file.txt file.huff
+```
 
-Il est possible d'ajouter à cette commande l'option `--visual` qui permet d'obtenir dans un fichier `compression_tree.dot` comptabile avec GraphViz:
-``` ./compresser.sh file.txt file.huff --visual```
+Il est possible d'ajouter à cette commande l'option `--visual` qui permet d'obtenir dans un fichier `compression_tree.dot` comptabile avec GraphViz:\
+```
+./compresser.sh file.txt file.huff --visual
+```
 
 La décompression fonctionne de façon analogue:
-```./decompresser file.huff file.txt```
+```
+./decompresser file.huff file.txt
+```
 et l'option `--visual` est également disponible pour la décompression.
